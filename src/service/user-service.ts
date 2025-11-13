@@ -23,7 +23,7 @@ export class UserService {
       throw new ResponseError(400, "Email is already exist");
     }
 
-    userRegister.password = bcrypt.hash(userRegister.password, 10);
+    userRegister.password = await bcrypt.hash(userRegister.password, 10);
 
     const user = await prismaClient.user.create({
       data: userRegister,

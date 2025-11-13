@@ -16,7 +16,6 @@ Request Body :
 ```json
 {
   "email": "user@example.com",
-  "password": "password123",
   "displayName": "User Nama"
 }
 ```
@@ -28,7 +27,7 @@ Response Body Success:
   "data": {
     "id": "uuid",
     "email": "user@example.com",
-    "displayName": "User Nama",
+    "name": "User Nama",
     "avatarUrl": null
   }
 }
