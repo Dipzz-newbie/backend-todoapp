@@ -14,5 +14,14 @@ datasource db {
 }
 
 model User {
-  Username String @id @db.VarChar(100)
+  id             String   @id @default(uuid()) @db.Char(36)
+  email          String   @unique
+  passwordHash   String
+  displayName    String?
+  avatarUrl      String?
+  tasks          Task[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("users")
 }
