@@ -1,6 +1,6 @@
-# Database & API Spec for Taskflow Sparkle (PostgreSQL + Prisma)
+# Database & API Spec for Taskflow Sparkle (MySQL + Prisma)
 
-## Database Schema (Prisma - PostgreSQL)
+## Database Schema (Prisma - MySQL)
 
 ```prisma
 generator client {
@@ -8,12 +8,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id             String   @id @default(uuid())
+  id             String   @id @default(uuid()) @db.Char(36)
   email          String   @unique
   passwordHash   String
   displayName    String?
@@ -26,19 +26,21 @@ model User {
 }
 
 model Task {
-  id          String   @id @default(uuid())
+  id          String   @id @default(uuid()) @db.Char(36)
   text        String
   completed   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   category    String?
-  userId      String
+  userId      String   @db.Char(36)
 
   user        User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@map("tasks")
 }
+
+
 ```
 
 ---
