@@ -5,7 +5,7 @@
 #### Register API
 
 ```http
-End Point : POST /api/auth/register
+End Point : POST /api/register
 ```
 Header:
 
@@ -47,7 +47,7 @@ Response Error:
 #### Login API
 
 ```http
-End Point : POST /api/auth/login
+End Point : POST /api/login
 ```
 Header:
 
