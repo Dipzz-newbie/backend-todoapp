@@ -58,7 +58,7 @@ export class UserService {
         email: userLogin.email,
       },
       data: {
-        token: uuid(),
+        token: user.token ?? uuid(),
       }
     })
     
