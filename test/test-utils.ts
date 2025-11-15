@@ -18,7 +18,7 @@ export class TestUser{
                 avatarUrl: null,
                 token: "test",
                 createdAt: new Date(),
-                updatedAt: null
+                updatedAt: new Date()
             }
         })
     }

@@ -2,12 +2,12 @@ import { User } from "@prisma/client";
 
 
 export type UserResponse = {
-    id?: string;
+    id: string;
     name: string;
     email: string;
-    avatarUrl?: string | null;
-    cratedAt?: Date | string;
-    updateAt?: Date | string | null;
+    avatarUrl: string | null;
+    createdAt: Date | string;
+    updateAt: Date | string | null;
     token?: string;
 }
 
@@ -24,7 +24,11 @@ export type LoginUserRequest = {
 
 export function toUserResponse(user: User): UserResponse {
     return {
+        id: user.id,
         name: user.name,
         email: user.email,
+        avatarUrl: user.avatarUrl,
+        updateAt: user.updatedAt,
+        createdAt: user.createdAt,
     }
 }

@@ -48,8 +48,8 @@ describe("POST /api/login", () => {
   it("Should be able to login", async () => {
     const response = await supertest(web).post("/api/login").send({
       email: "test@example.com",
-      password: "test"
-    })
+      password: "test",
+    });
 
     logger.debug(response.body);
     expect(response.status).toBe(200);
@@ -60,8 +60,8 @@ describe("POST /api/login", () => {
   it("Should rejected if email is incorrect", async () => {
     const response = await supertest(web).post("/api/login").send({
       email: "salah",
-      password: "test"
-    })
+      password: "test",
+    });
 
     logger.debug(response.body);
     expect(response.status).toBe(401);
@@ -71,8 +71,8 @@ describe("POST /api/login", () => {
   it("Should rejected if password is incorrect", async () => {
     const response = await supertest(web).post("/api/login").send({
       email: "email@example.com",
-      password: "salah"
-    })
+      password: "salah",
+    });
 
     logger.debug(response.body);
     expect(response.status).toBe(401);
@@ -82,13 +82,47 @@ describe("POST /api/login", () => {
   it("Should rejected if data is invalid", async () => {
     const response = await supertest(web).post("/api/login").send({
       email: "",
-      password: ""
-    })
+      password: "",
+    });
 
     logger.debug(response.body);
     expect(response.status).toBe(400);
     expect(response.body.errors).toBeDefined();
   });
+});
 
-  
+describe("POST /api/users/login", () => {
+  beforeEach(async () => {
+    await TestUser.create();
+  });
+
+  afterEach(async () => {
+    await TestUser.delete();
+  });
+
+  it("Should be able to get current user", async () => {
+    const response = await supertest(web)
+      .get("/api/users/current")
+      .set("token", "test");
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.data.id).toBeDefined();
+    expect(response.body.data.email).toBe("test@example.com");
+    expect(response.body.data.name).toBe("test");
+    expect(response.body.data.avatarUrl).toBeNull();
+    expect(response.body.data.token).toBeUndefined();
+    expect(new Date(response.body.data.updateAt)).toBeInstanceOf(Date);
+    expect(new Date(response.body.data.createAt)).toBeInstanceOf(Date);
+  });
+
+  it("Should rejected if token is incorrect or not found", async () => {
+    const response = await supertest(web)
+      .get("/api/users/current")
+      .set("token", "salah");
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.errors).toBeDefined();
+  });
 });
