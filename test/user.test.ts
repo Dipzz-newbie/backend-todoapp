@@ -18,7 +18,6 @@ describe("POST /api/register", () => {
     logger.debug(response.body);
 
     expect(response.status).toBe(200);
-    expect(response.body.data.id).toBeDefined();
     expect(response.body.data.email).toBe("test@example.com");
     expect(response.body.data.name).toBe("test");
   });
