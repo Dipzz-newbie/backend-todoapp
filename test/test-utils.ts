@@ -15,7 +15,10 @@ export class TestUser{
                 email: "test@example.com",
                 name: "test",
                 password: await bcrypt.hash("test", 10),
-                token: "test"
+                avatarUrl: null,
+                token: "test",
+                createdAt: new Date(),
+                updatedAt: null
             }
         })
     }
