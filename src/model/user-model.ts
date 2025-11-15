@@ -3,11 +3,11 @@ import { User } from "@prisma/client";
 
 export type UserResponse = {
     id?: string;
-    name?: string;
-    email?: string;
+    name: string;
+    email: string;
     avatarUrl?: string | null;
-    cratedAt?: Date;
-    updateAt?: Date;
+    cratedAt?: Date | string;
+    updateAt?: Date | string | null;
     token?: string;
 }
 

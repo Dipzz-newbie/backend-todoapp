@@ -66,12 +66,6 @@ Response Body (Success):
 {
   "data": {
     "token": "jwt-token-string",
-    "user": {
-      "id": "uuid",
-      "email": "user@example.com",
-      "displayName": "User Nama",
-      "avatarUrl": null
-    }
   }
 }
 ```
