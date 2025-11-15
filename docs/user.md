@@ -7,6 +7,7 @@
 ```http
 End Point : POST /api/register
 ```
+
 Header:
 
 - Content-Type: application/json
@@ -16,7 +17,8 @@ Request Body :
 ```json
 {
   "email": "user@example.com",
-  "displayName": "User Nama"
+  "password": "test",
+  "name": "User Nama"
 }
 ```
 
@@ -28,7 +30,6 @@ Response Body Success:
     "id": "uuid",
     "email": "user@example.com",
     "name": "User Nama",
-    "avatarUrl": null
   }
 }
 ```
@@ -48,6 +49,7 @@ Response Error:
 ```http
 End Point : POST /api/login
 ```
+
 Header:
 
 - Content-Type: application/json
@@ -60,12 +62,15 @@ Request Body:
   "password": "password123"
 }
 ```
+
 Response Body (Success):
 
 ```json
 {
   "data": {
-    "token": "jwt-token-string",
+    "email": "user@example.com",
+    "password": "password123",
+    "token": "random-token",
   }
 }
 ```
@@ -74,7 +79,7 @@ Response Error:
 
 ```json
 {
-  "errors": "Invalid email or password"
+  "errors": "Password or email is incorrect"
 }
 ```
 
@@ -85,21 +90,24 @@ Response Error:
 #### Get User Profile
 
 ```http
-End Point : GET /api/users/me
+End Point : GET /api/users/current
 ```
+
 Header:
 
-- Authorization: Bearer <token>
+- Authorization: token
 
 Response Body Success:
 
 ```json
 {
   "data": {
-    "id": "uuid",
-    "email": "user@example.com",
-    "displayName": "User Nama",
-    "avatarUrl": null
+    "id": "random-uuid",
+    "email": "test@example.com",
+    "name": "test",
+    "avatarUrl": null,
+    "createdAt": "10-2-2025",
+    "updateAt": "10-2-2025"
   }
 }
 ```
@@ -119,6 +127,7 @@ Response Error:
 ```http
 End Point : PUT /api/users/me
 ```
+
 Header:
 
 - Authorization: Bearer <token>
