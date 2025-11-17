@@ -23,7 +23,7 @@ export type CreateUserRequest = {
 }
 
 export type UpdateUserRequest = {
-    name?: string;
+    name: string;
     avatarUrl?: string;
 }
 

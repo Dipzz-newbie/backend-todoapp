@@ -10,7 +10,7 @@ export const authMiddleware = async (
 ) => {
   const header = req.headers.authorization;
   if (!header) {
-    return res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({ message: "Unauthorized" }).end();
   }
 
   const token = header.split(" ")[1];
@@ -28,12 +28,12 @@ export const authMiddleware = async (
     });
 
     if(!user) {
-      return res.status(401).json({ errors: "Unauthorized" });
+      return res.status(401).json({ errors: "Unauthorized" }).end();
     }
 
     req.user = user!;
     next();
   } catch (err) {
-    return res.status(401).json({ errors: "Invalid or expired token" });
+    return res.status(401).json({ errors: "Invalid or expired token" }).end();
   }
 };

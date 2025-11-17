@@ -5,12 +5,13 @@ import {
   CreateUserRequest,
   LoginUserRequest,
   toUserResponse,
+  UpdateUserRequest,
   UserResponse,
 } from "../model/user-model";
 import { UserValidation } from "../validation/user-validation";
 import { Validation } from "../validation/validation";
 import bcrypt from "bcrypt";
-import jwt, {Secret} from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 export class UserService {
   static async register(request: CreateUserRequest): Promise<UserResponse> {
@@ -93,5 +94,36 @@ export class UserService {
     })
 
     return toUserResponse(userGet!);
+  }
+
+  static async update(user: User, request: UpdateUserRequest): Promise<UserResponse> {
+    const userUpdate = Validation.validate(UserValidation.UPDATE, request);
+
+    if (userUpdate.name) {
+      user.name = userUpdate.name;
+    }
+
+    if (userUpdate.avatarUrl) {
+      user.avatarUrl = userUpdate.avatarUrl;
+    }
+
+    const userExistsOnDatabase = await prismaClient.user.findUnique({
+      where: {
+        email: user.email,
+      }
+    });
+
+    if(!userExistsOnDatabase) {
+      throw new ResponseError(404, "User not found");
+    }
+
+    const result = await prismaClient.user.update({
+      where: {
+        email: user.email
+      }, 
+      data: userUpdate
+    })
+
+    return toUserResponse(result);
   }
 }
