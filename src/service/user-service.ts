@@ -84,7 +84,14 @@ export class UserService {
   return response;
 }
 
-  static async get(user: User): Promise<UserResponse> {
-    return toUserResponse(user);
+  static async get(user:User): Promise<UserResponse> {
+
+    const userGet = await prismaClient.user.findUnique({
+      where: {
+        id: user.id
+      }
+    })
+
+    return toUserResponse(userGet!);
   }
 }

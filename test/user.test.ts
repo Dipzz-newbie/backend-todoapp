@@ -3,6 +3,8 @@ import { TestUser } from "./test-utils";
 import { web } from "../src/app/web";
 import { logger } from "../src/app/logging";
 
+
+
 describe("POST /api/register", () => {
   afterEach(async () => {
     await TestUser.delete();
@@ -101,9 +103,10 @@ describe("POST /api/users/login", () => {
   });
 
   it("Should be able to get current user", async () => {
+    const token = TestUser.token();
     const response = await supertest(web)
       .get("/api/users/current")
-      .set("token", "test");
+      .set("Authorization", `Bearer ${token}`);
 
     logger.debug(response.body);
     expect(response.status).toBe(200);
@@ -117,9 +120,10 @@ describe("POST /api/users/login", () => {
   });
 
   it("Should rejected if token is incorrect or not found", async () => {
+    const token = TestUser.token() + "salah";
     const response = await supertest(web)
       .get("/api/users/current")
-      .set("token", "salah");
+      .set("Authorization", `Bearer ${token}`);
 
     logger.debug(response.body);
     expect(response.status).toBe(401);

@@ -1,29 +1,39 @@
 import { Response, NextFunction } from "express";
-import { prismaClient } from "../app/database";
+import jwt from "jsonwebtoken";
 import { UserRequest } from "../type/user-request";
+import { prismaClient } from "../app/database";
 
 export const authMiddleware = async (
   req: UserRequest,
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.get("token");
-
-  if (token) {
-    const user = await prismaClient.user.findFirst({
-      where: {
-        token: token,
-      },
-    });
-
-    if (user) {
-      req.user = user;
-      next();
-      return;
-    }
+  const header = req.headers.authorization;
+  if (!header) {
+    return res.status(401).json({ message: "Unauthorized" });
   }
 
-  res.status(401).json({
-    errors: "Unauthorized",
-  });
+  const token = header.split(" ")[1];
+
+  try {
+    const payload = jwt.verify(
+      token,
+      process.env.JWT_SECRET!
+    ) as jwt.JwtPayload;
+    
+    const user = await prismaClient.user.findUnique({
+      where: {
+        id: payload.id as string
+      }
+    });
+
+    if(!user) {
+      return res.status(401).json({ errors: "Unauthorized" });
+    }
+
+    req.user = user!;
+    next();
+  } catch (err) {
+    return res.status(401).json({ errors: "Invalid or expired token" });
+  }
 };

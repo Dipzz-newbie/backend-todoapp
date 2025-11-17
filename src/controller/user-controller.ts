@@ -30,8 +30,7 @@ export class UserController {
 
   static async get(req: UserRequest, res: Response, next: NextFunction) {
     try {
-      const user = req.user!;
-      const response = await UserService.get(user);
+      const response = await UserService.get(req.user!);
       res.status(200).json({
         data: response
       })
