@@ -14,6 +14,17 @@ export class TestUser {
       { expiresIn: process.env.JWT_EXPIRES_IN! } as jwt.SignOptions
     );
   }
+  static ErrToken() {
+     return jwt.sign(
+      {
+        id: "2",
+        email: "test@example.com",
+        name: "test",
+      },
+      process.env.JWT_SECRET!,
+      { expiresIn: process.env.JWT_EXPIRES_IN! } as jwt.SignOptions
+    );
+  }
   static async delete() {
     await prismaClient.user.deleteMany({
       where: {

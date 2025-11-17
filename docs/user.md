@@ -95,7 +95,7 @@ End Point : GET /api/users/current
 
 Header:
 
-- Authorization: token
+- Authorization: Bearer {Token}
 
 Response Body Success:
 
@@ -116,7 +116,7 @@ Response Error:
 
 ```json
 {
-  "errors": "User not found"
+  "errors": "Unauthorized"
 }
 ```
 
@@ -125,7 +125,7 @@ Response Error:
 #### Update User Profile
 
 ```http
-End Point : PUT /api/users/me
+End Point : PUT /api/users/update
 ```
 
 Header:
@@ -137,7 +137,7 @@ Request Body (one or both fields allowed):
 
 ```json
 {
-  "displayName": "Nama Baru",
+  "Name": "Nama Baru",
   "avatarUrl": "https://imageurl.com"
 }
 ```

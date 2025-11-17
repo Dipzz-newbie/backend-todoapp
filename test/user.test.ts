@@ -129,4 +129,16 @@ describe("POST /api/users/login", () => {
     expect(response.status).toBe(401);
     expect(response.body.errors).toBeDefined();
   });
+
+  it("Should rejected if token not match", async () => {
+    const token = TestUser.ErrToken();
+    const response = await supertest(web)
+      .get("/api/users/current")
+      .set("Authorization", `Bearer ${token}`);
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.errors).toBeDefined();
+
+  });
 });
