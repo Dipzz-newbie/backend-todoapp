@@ -10,7 +10,7 @@ import {
 import { UserValidation } from "../validation/user-validation";
 import { Validation } from "../validation/validation";
 import bcrypt from "bcrypt";
-import { v4 as uuid } from "uuid";
+import jwt, {Secret} from "jsonwebtoken";
 
 export class UserService {
   static async register(request: CreateUserRequest): Promise<UserResponse> {
@@ -41,32 +41,48 @@ export class UserService {
     let user = await prismaClient.user.findUnique({
       where: {
         email: userLogin.email,
-      }
+      },
     });
 
-    if(!user) {
+    if (!user) {
       throw new ResponseError(401, "Password or email is incorrect");
     }
 
-    const isPasswordValid = await bcrypt.compare(userLogin.password, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      userLogin.password,
+      user.password
+    );
 
-    if(!isPasswordValid) {
+    if (!isPasswordValid) {
       throw new ResponseError(401, "Password or email is incorrect");
     }
 
-    user = await prismaClient.user.update({
-      where: {
-        email: userLogin.email,
-      },
-      data: {
-        token: user.token ?? uuid(),
-      }
-    })
-    
-    const response = toUserResponse(user);
-    response.token = user.token!;
-    return response;
+  const secret = process.env.JWT_SECRET;
+  const jwtExpiresIn = process.env.JWT_EXPIRES_IN;
+
+  if (!secret) {
+    throw new ResponseError(500, "JWT secret is not defined");
   }
+
+  if (!jwtExpiresIn) {
+    throw new ResponseError(500, "JWT expires in is not defined");
+  }
+
+  const token = jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+    },
+    secret, 
+    {
+      expiresIn: jwtExpiresIn,
+    } as jwt.SignOptions
+  );
+
+  const response = toUserResponse(user);
+  response.token = token;
+  return response;
+}
 
   static async get(user: User): Promise<UserResponse> {
     return toUserResponse(user);
