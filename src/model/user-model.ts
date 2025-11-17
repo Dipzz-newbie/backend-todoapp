@@ -11,15 +11,20 @@ export type UserResponse = {
     token?: string;
 }
 
+export type LoginUserRequest = {
+    email: string;
+    password: string;
+}
+
 export type CreateUserRequest = {
     email: string;
     password: string;
     name: string;
 }
 
-export type LoginUserRequest = {
-    email: string;
-    password: string;
+export type UpdateUserRequest = {
+    name?: string;
+    avatarUrl?: string;
 }
 
 export function toUserResponse(user: User): UserResponse {
