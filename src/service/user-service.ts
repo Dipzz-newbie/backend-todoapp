@@ -148,4 +148,5 @@ export class UserService {
 
     return toUserResponse(result);
   }
+
 }
