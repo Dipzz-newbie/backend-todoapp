@@ -88,8 +88,8 @@ export class UserService {
         token: refreshToken,
         userId: user.id,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      }
-    })
+      },
+    });
 
     const response = toUserResponse(user);
     response.token = accessToken;
@@ -149,4 +149,16 @@ export class UserService {
     return toUserResponse(result);
   }
 
+  static async logout(user: User, refreshToken: string) {
+    if (!refreshToken) {
+      throw new ResponseError(400, "Refresh token is required");
+    }
+
+    await prismaClient.refreshToken.deleteMany({
+      where: {
+        userId: user.id,
+        token: refreshToken,
+      },
+    });
+  }
 }

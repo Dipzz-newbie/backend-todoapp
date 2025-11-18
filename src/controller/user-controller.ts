@@ -116,4 +116,21 @@ export class UserController {
       next(e);
     }
   }
+
+  static async logout(req: UserRequest, res: Response, next: NextFunction) {
+    try {
+      const { refreshToken } = req.body;
+      const user = req.user!;
+
+      await UserService.logout(user, refreshToken);
+
+      res.status(200).json({
+        data: {
+          message: "Successfully logged out",
+        },
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
 }
