@@ -131,95 +131,130 @@ describe("POST /api/users/currrent", () => {
   });
 });
 
-// describe("GET /api/users/current", () => {
-//   beforeEach(async () => {
-//     await TestUser.create();
-//   });
+describe("GET /api/users/current", () => {
+  beforeEach(async () => {
+    await TestUser.create();
+  });
 
-//   afterEach(async () => {
-//     await TestUser.delete();
-//   });
+  afterEach(async () => {
+    await TestUser.delete();
+  });
 
-//   it("Should be able to get current user", async () => {
-//     const login = await supertest(web).post("/api/login").send({
-//       email: "test@example.com",
-//       password: "test",
-//     });
-//     const token = login.body.data.token;
+  it("Should be able to get current user", async () => {
+    const login = await supertest(web).post("/api/login").send({
+      email: "test@example.com",
+      password: "test",
+    });
+    const token = login.body.data.token;
 
-//     const response = await supertest(web)
-//       .get("/api/users/current")
-//       .set("Authorization", `Bearer ${token}`);
+    const response = await supertest(web)
+      .get("/api/users/current")
+      .set("Authorization", `Bearer ${token}`);
 
-//     logger.debug(response.body);
-//     expect(response.status).toBe(200);
-//     expect(response.body.data.id).toBeDefined();
-//     expect(response.body.data.email).toBe("test@example.com");
-//     expect(response.body.data.name).toBe("test");
-//     expect(response.body.data.avatarUrl).toBeNull();
-//     expect(response.body.data.token).toBeUndefined();
-//     expect(new Date(response.body.data.updateAt)).toBeInstanceOf(Date);
-//     expect(new Date(response.body.data.createAt)).toBeInstanceOf(Date);
-//   });
-// });
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.data.id).toBeDefined();
+    expect(response.body.data.email).toBe("test@example.com");
+    expect(response.body.data.name).toBe("test");
+    expect(response.body.data.avatarUrl).toBeNull();
+    expect(response.body.data.token).toBeUndefined();
+    expect(new Date(response.body.data.updateAt)).toBeInstanceOf(Date);
+    expect(new Date(response.body.data.createAt)).toBeInstanceOf(Date);
+  });
 
-// it("Should rejected if token is incorrect or not found", async () => {
-//   const token = TestUser.token() + "salah";
-//   const response = await supertest(web)
-//     .get("/api/users/current")
-//     .set("Authorization", `Bearer ${token}`);
+  it("Should rejected if token is incorrect or not found", async () => {
+    const token = TestUser.token() + "salah";
+    const response = await supertest(web)
+      .get("/api/users/current")
+      .set("Authorization", `Bearer ${token}`);
 
-//   logger.debug(response.body);
-//   expect(response.status).toBe(401);
-//   expect(response.body.errors).toBeDefined();
-// });
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.errors).toBeDefined();
+  });
 
-// it("Should rejected if token not match", async () => {
-//   const token = TestUser.ErrToken();
-//   const response = await supertest(web)
-//     .get("/api/users/current")
-//     .set("Authorization", `Bearer ${token}`);
+});
 
-//   logger.debug(response.body);
-//   expect(response.status).toBe(401);
-//   expect(response.body.errors).toBeDefined();
-// });
+describe("PATCH /api/users/current", () => {
+  beforeEach(async () => {
+    await TestUser.create();
+  });
 
-// describe("PATCH /api/users/current", () => {
-//   beforeEach(async () => {
-//     await TestUser.create();
-//   });
+  afterEach(async () => {
+    await TestUser.delete();
+  });
 
-//   afterEach(async () => {
-//     await TestUser.delete();
-//   });
+  it("Should be able to update current user", async () => {
+    const login = await supertest(web).post("/api/login").send({
+      email: "test@example.com",
+      password: "test",
+    });
+    const token = login.body.data.token;
+    const response = await supertest(web)
+      .patch("/api/users/current")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        password: "new password",
+        name: "test",
+        avatarUrl: "http://example.com/avatar.png",
+      });
 
-//   it("Should be able to update current user", async () => {
-//     const token = TestUser.token();
-//     const response = await supertest(web)
-//       .patch("/api/users/current")
-//       .set("Authorization", `Bearer ${token}`)
-//       .send({
-//         password: "new password",
-//         name: "test",
-//         avatarUrl: "http://example.com/avatar.png",
-//       });
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.data.id).toBeDefined();
+    expect(response.body.data.email).toBeDefined();
+  });
 
-//     logger.debug(response.body);
-//     expect(response.status).toBe(200);
-//     expect(response.body.data.id).toBeDefined();
-//     expect(response.body.data.email).toBeDefined();
-//   });
+  it("Should rejected if data is invalid", async () => {
+    const token = TestUser.token();
+    const response = await supertest(web)
+      .patch("/api/users/current")
+      .set("Authorization", `Bearer ${token}`)
+      .send({});
 
-//   it("Should rejected if data is invalid", async () => {
-//     const token = TestUser.token();
-//     const response = await supertest(web)
-//       .patch("/api/users/current")
-//       .set("Authorization", `Bearer ${token}`)
-//       .send({});
+    logger.debug(response.body);
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toBeDefined();
+  });
 
-//     logger.debug(response.body);
-//     expect(response.status).toBe(400);
-//     expect(response.body.errors).toBeDefined();
-//   });
-// });
+  it("Should rejected if token is invalid", async () => {
+    const token = TestUser.token() + "salah";
+    const response = await supertest(web)
+      .patch("/api/users/current")
+      .set("Authorization", `Bearer ${token}`)
+      .send({});
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.errors).toBeDefined();
+  });
+});
+
+describe("POST /api/users/logout", () => {
+  beforeEach(async () => {
+    await TestUser.create();
+  });
+
+  afterEach(async () => {
+    await TestUser.delete();
+  });
+
+  it("Should logout and invalidate refresh token", async () => {
+    const login = await supertest(web).post("/api/login").send({
+      email: "test@example.com",
+      password: "test",
+    });
+
+    const refreshToken = login.body.data.refreshToken;
+
+    await supertest(web)
+      .post("/api/logout")
+      .send({ refreshToken });
+
+    const refreshAttempt = await supertest(web)
+      .post("/api/refresh")
+      .send({ refreshToken });
+
+    expect(refreshAttempt.status).toBe(401);
+  });
+});
