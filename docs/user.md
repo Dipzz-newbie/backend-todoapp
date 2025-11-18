@@ -125,7 +125,7 @@ Response Error:
 #### Update User Profile
 
 ```http
-End Point : PUT /api/users/update
+End Point : PATCH /api/users/current
 ```
 
 Header:

@@ -58,71 +58,79 @@ export class UserService {
       throw new ResponseError(401, "Password or email is incorrect");
     }
 
-  const secret = process.env.JWT_SECRET;
-  const jwtExpiresIn = process.env.JWT_EXPIRES_IN;
+    const secret = process.env.JWT_SECRET;
+    const jwtExpiresIn = process.env.JWT_EXPIRES_IN;
 
-  if (!secret) {
-    throw new ResponseError(500, "JWT secret is not defined");
+    if (!secret) {
+      throw new ResponseError(500, "JWT secret is not defined");
+    }
+
+    if (!jwtExpiresIn) {
+      throw new ResponseError(500, "JWT expires in is not defined");
+    }
+
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+      },
+      secret,
+      {
+        expiresIn: jwtExpiresIn,
+      } as jwt.SignOptions
+    );
+
+    const response = toUserResponse(user);
+    response.token = token;
+    return response;
   }
 
-  if (!jwtExpiresIn) {
-    throw new ResponseError(500, "JWT expires in is not defined");
-  }
-
-  const token = jwt.sign(
-    {
-      id: user.id,
-      email: user.email,
-    },
-    secret, 
-    {
-      expiresIn: jwtExpiresIn,
-    } as jwt.SignOptions
-  );
-
-  const response = toUserResponse(user);
-  response.token = token;
-  return response;
-}
-
-  static async get(user:User): Promise<UserResponse> {
-
+  static async get(user: User): Promise<UserResponse> {
     const userGet = await prismaClient.user.findUnique({
       where: {
-        id: user.id
-      }
-    })
+        id: user.id,
+      },
+    });
 
     return toUserResponse(userGet!);
   }
 
-  static async update(user: User, request: UpdateUserRequest): Promise<UserResponse> {
+  static async update(
+    user: User,
+    request: UpdateUserRequest
+  ): Promise<UserResponse> {
     const userUpdate = Validation.validate(UserValidation.UPDATE, request);
 
-    if (userUpdate.name) {
-      user.name = userUpdate.name;
-    }
+    if (userUpdate) {
+      if (userUpdate.password) {
+        userUpdate.password = await bcrypt.hash(userUpdate.password, 10);
+      }
 
-    if (userUpdate.avatarUrl) {
-      user.avatarUrl = userUpdate.avatarUrl;
+      if (userUpdate.name) {
+        user.name = userUpdate.name;
+      }
+
+      if (userUpdate.avatarUrl) {
+        user.avatarUrl = userUpdate.avatarUrl;
+      }
     }
 
     const userExistsOnDatabase = await prismaClient.user.findUnique({
       where: {
         email: user.email,
-      }
+      },
     });
 
-    if(!userExistsOnDatabase) {
+    if (!userExistsOnDatabase) {
       throw new ResponseError(404, "User not found");
     }
 
     const result = await prismaClient.user.update({
       where: {
-        email: user.email
-      }, 
-      data: userUpdate
-    })
+        email: user.email,
+      },
+      data: userUpdate,
+    });
 
     return toUserResponse(result);
   }

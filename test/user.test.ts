@@ -3,8 +3,6 @@ import { TestUser } from "./test-utils";
 import { web } from "../src/app/web";
 import { logger } from "../src/app/logging";
 
-
-
 describe("POST /api/register", () => {
   afterEach(async () => {
     await TestUser.delete();
@@ -93,7 +91,7 @@ describe("POST /api/login", () => {
   });
 });
 
-describe("POST /api/users/login", () => {
+describe("GET /api/users/current", () => {
   beforeEach(async () => {
     await TestUser.create();
   });
@@ -139,6 +137,44 @@ describe("POST /api/users/login", () => {
     logger.debug(response.body);
     expect(response.status).toBe(401);
     expect(response.body.errors).toBeDefined();
+  });
+});
 
+describe("PATCH /api/users/current", () => {
+  beforeEach(async () => {
+    await TestUser.create();
+  });
+
+  afterEach(async () => {
+    await TestUser.delete();
+  });
+
+  it("Should be able to update current user", async () => {
+    const token = TestUser.token();
+    const response = await supertest(web)
+      .patch("/api/users/current")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        password: "new password",
+        name: "test",
+        avatarUrl: "http://example.com/avatar.png",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.data.id).toBeDefined();
+    expect(response.body.data.email).toBeDefined();
+  });
+
+  it("Should rejected if data is invalid", async () => {
+    const token = TestUser.token();
+    const response = await supertest(web)
+      .patch("/api/users/current")
+      .set("Authorization", `Bearer ${token}`)
+      .send({});
+
+    logger.debug(response.body);
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toBeDefined();
   });
 });

@@ -34,6 +34,6 @@ export const authMiddleware = async (
     req.user = user!;
     next();
   } catch (err) {
-    return res.status(401).json({ errors: "Invalid or expired token" }).end();
+    return res.status(401).json({ errors: "Unauthorized" }).end();
   }
 };
