@@ -95,7 +95,7 @@ export class UserService {
     response.token = accessToken;
     return {
       ...response,
-      refreshToken: refreshToken,
+      refresh_token: refreshToken,
     } as any;
   }
 
