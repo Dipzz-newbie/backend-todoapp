@@ -12,6 +12,7 @@ import { UserValidation } from "../validation/user-validation";
 import { Validation } from "../validation/validation";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { generateRefreshToken } from "../utils/token-utils";
 
 export class UserService {
   static async register(request: CreateUserRequest): Promise<UserResponse> {
@@ -69,7 +70,7 @@ export class UserService {
       throw new ResponseError(500, "JWT expires in is not defined");
     }
 
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       {
         id: user.id,
         email: user.email,
@@ -80,9 +81,22 @@ export class UserService {
       } as jwt.SignOptions
     );
 
+    const refreshToken = generateRefreshToken();
+
+    await prismaClient.refreshToken.create({
+      data: {
+        token: refreshToken,
+        userId: user.id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      }
+    })
+
     const response = toUserResponse(user);
-    response.token = token;
-    return response;
+    response.token = accessToken;
+    return {
+      ...response,
+      refreshToken: refreshToken,
+    } as any;
   }
 
   static async get(user: User): Promise<UserResponse> {

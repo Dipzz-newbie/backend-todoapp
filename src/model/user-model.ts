@@ -9,6 +9,7 @@ export type UserResponse = {
     createdAt: Date | string;
     updateAt: Date | string | null;
     token?: string;
+    refreshToken?: string;
 }
 
 export type LoginUserRequest = {
