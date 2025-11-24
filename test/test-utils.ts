@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 export class TestUser {
   static token() {
-     return jwt.sign(
+    return jwt.sign(
       {
         id: "1",
         email: "test@example.com",
@@ -15,7 +15,7 @@ export class TestUser {
     );
   }
   static ErrToken() {
-     return jwt.sign(
+    return jwt.sign(
       {
         id: "2",
         email: "test@example.com",
@@ -35,7 +35,6 @@ export class TestUser {
   static async create() {
     await prismaClient.user.create({
       data: {
-        id: "1",
         email: "test@example.com",
         name: "test",
         password: await bcrypt.hash("test", 10),

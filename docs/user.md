@@ -26,10 +26,13 @@ Response Body Success:
 
 ```json
 {
-  "data": {
-    "id": "uuid",
-    "email": "user@example.com",
-    "name": "User Nama",
+  {
+  "id":"<id:uuid>",
+  "name":"test",
+  "email":"test@example.com",
+  "avatarUrl":null,
+  "createdAt":"2025-11-24T12:15:17.689Z",
+  "updateAt":"2025-11-24T12:15:17.689Z"
   }
 }
 ```
@@ -68,10 +71,15 @@ Response Body (Success):
 ```json
 {
   "data": {
-    "email": "user@example.com",
-    "password": "password123",
-    "token": "random-token",
-  }
+    "id": "<id:uuid>",
+    "name": "test",
+    "email": "test@example.com",
+    "avatarUrl": null,
+    "refreshToken": "<token:uuid>",
+    "token": "<token:uuid>",
+    "updateAt": "2025-11-24T12:20:12.688Z"
+  },
+  "createdAt": "2025-11-24T12:20:12.688Z"
 }
 ```
 
@@ -84,6 +92,48 @@ Response Error:
 ```
 
 ---
+
+#### Refresh Token API
+
+```http
+End Point : POST /api/users/current
+```
+
+Header:
+
+- Authorization: Bearer {Token}
+
+Request Body:
+
+```json
+{
+  "data": {
+    "refershToken": "<token:uuid>",
+    "token": "<token:uuid>"
+  }
+}
+```
+
+Response Body Success:
+
+```json
+{
+  "data": {
+    "refershToken": "<token:uuid>",
+    "token": "<token:uuid>"
+  }
+}
+```
+
+Response Body Error:
+
+```json
+{
+  "data": {
+    "errors": "Refresh token is required"
+  }
+}
+```
 
 ### User Profile
 
@@ -102,12 +152,12 @@ Response Body Success:
 ```json
 {
   "data": {
-    "id": "random-uuid",
+    "id": "<id:uuid>",
     "email": "test@example.com",
     "name": "test",
     "avatarUrl": null,
-    "createdAt": "10-2-2025",
-    "updateAt": "10-2-2025"
+    "createdAt": "2025-11-24T13:21:26.759Z",
+    "updateAt": "2025-11-24T13:21:26.759Z"
   }
 }
 ```
@@ -137,8 +187,9 @@ Request Body (one or both fields allowed):
 
 ```json
 {
-  "Name": "Nama Baru",
-  "avatarUrl": "https://imageurl.com"
+  "password": "new password",
+  "name": "test",
+  "avatarUrl": "http://example.com/avatar.png"
 }
 ```
 
@@ -147,10 +198,13 @@ Response Body Success:
 ```json
 {
   "data": {
-    "id": "uuid",
-    "email": "user@example.com",
-    "displayName": "Nama Baru",
-    "avatarUrl": "https://imageurl.com"
+    "data":{
+      "id":"<id:uuid>",
+      "email":"test@example.com",
+      "name":"test",
+      "avatarUrl":"http://example.com/avatar.png",
+      "createdAt":"2025-11-24T13:25:15.675Z",
+      "updateAt":"2025-11-24T13:25:16.050Z"}
   }
 }
 ```
@@ -159,8 +213,50 @@ Response Error:
 
 ```json
 {
-  "errors": "User not found"
+  "errors": "Unauthorized"
 }
 ```
+
+#### Logout User 
+
+```http
+End Point : POST /api/users/logout
+```
+
+Header:
+
+- Authorization: Bearer {Token}
+
+Request Body:
+
+```json
+{
+  "data": {
+    "refershToken": "<token:uuid>",
+  }
+}
+```
+
+Response Body Success:
+
+```json
+{
+  "data": {
+    "refershToken": "<token:uuid>",
+    "token": "<token:uuid>"
+  }
+}
+```
+
+Response Body Error:
+
+```json
+{
+  "data": {
+    "errors": "Refresh token is required"
+  }
+}
+```
+
 
 ---

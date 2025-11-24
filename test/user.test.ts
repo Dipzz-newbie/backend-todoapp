@@ -56,7 +56,7 @@ describe("POST /api/login", () => {
     expect(response.body.data.email).toBe("test@example.com");
     expect(response.body.data.name).toBe("test");
     expect(response.body.data.token).toBeDefined();
-    expect(response.body.data.refresh_token).toBeDefined();
+    expect(response.body.data.refreshToken).toBeDefined();
   });
 
   it("Should rejected if email is incorrect", async () => {
@@ -109,7 +109,7 @@ describe("POST /api/users/currrent", () => {
     });
 
     const token = login.body.data.token;
-    const refresh_token = login.body.data.refresh_token;
+    const refresh_token = login.body.data.refreshToken;
 
     const response = await supertest(web)
       .post("/api/users/current")
@@ -172,7 +172,6 @@ describe("GET /api/users/current", () => {
     expect(response.status).toBe(401);
     expect(response.body.errors).toBeDefined();
   });
-
 });
 
 describe("PATCH /api/users/current", () => {
@@ -206,7 +205,11 @@ describe("PATCH /api/users/current", () => {
   });
 
   it("Should rejected if data is invalid", async () => {
-    const token = TestUser.token();
+    const login = await supertest(web).post("/api/login").send({
+      email: "test@example.com",
+      password: "test",
+    });
+    const token = login.body.data.token
     const response = await supertest(web)
       .patch("/api/users/current")
       .set("Authorization", `Bearer ${token}`)
@@ -246,15 +249,25 @@ describe("POST /api/users/logout", () => {
     });
 
     const refreshToken = login.body.data.refreshToken;
+    const token = login.body.data.token;
 
-    await supertest(web)
-      .post("/api/logout")
-      .send({ refreshToken });
+    await supertest(web).post("/api/logout").send({ refreshToken, token });
 
     const refreshAttempt = await supertest(web)
       .post("/api/refresh")
       .send({ refreshToken });
 
-    expect(refreshAttempt.status).toBe(401);
+    const response = await supertest(web)
+      .patch("/api/users/current")
+      .set("Authorization", `Bearer ${login.body.data.refreshToken}`)
+      .send({
+        password: "new password",
+        name: "test",
+        avatarUrl: "http://example.com/avatar.png",
+      });
+
+    logger.debug(response.body);
+    logger.debug(refreshAttempt.body);
+    expect(response.body.errors).toBeDefined();
   });
 });

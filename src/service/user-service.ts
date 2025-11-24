@@ -95,7 +95,7 @@ export class UserService {
     response.token = accessToken;
     return {
       ...response,
-      refresh_token: refreshToken,
+      refreshToken: refreshToken,
     } as any;
   }
 
@@ -149,9 +149,13 @@ export class UserService {
     return toUserResponse(result);
   }
 
-  static async logout(user: User, refreshToken: string) {
+  static async logout(user: User, refreshToken: string, token:string) {
     if (!refreshToken) {
       throw new ResponseError(400, "Refresh token is required");
+    }
+
+    if (!token) {
+      throw new ResponseError(401, "Unauthorized");
     }
 
     await prismaClient.refreshToken.deleteMany({
