@@ -3,7 +3,7 @@
 #### Create Task
 
 ```http
-End Point : POST /api/tasks
+End Point : POST /api/users/tasks
 ```
 
 Header:
@@ -16,7 +16,7 @@ Request Body:
 ```json
 {
   "text": "Belajar Next.js",
-  "category": "Belajar"
+  "desc": "Belajar"
 }
 ```
 
@@ -48,7 +48,7 @@ Response Error:
 #### Update Task
 
 ```http
-End Point : PUT /api/tasks/:taskId
+End Point : PUT /api/users/tasks/:taskId
 ```
 
 Header:
@@ -94,7 +94,7 @@ Response Error:
 #### Get Task by id
 
 ```http
-End Point : GET /api/tasks/:taskId
+End Point : GET /api/users/tasks/:taskId
 ```
 
 Header:
@@ -129,7 +129,7 @@ Response Error:
 #### List All User Tasks
 
 ```http
-End Point : GET /api/tasks
+End Point : GET /api/users/tasks
 ```
 
 Header:
@@ -174,7 +174,7 @@ Response Error:
 #### Delete Task
 
 ```http
-End Point : DELETE /api/tasks/:taskId
+End Point : DELETE /api/users/tasks/:taskId
 ```
 
 Header:
