@@ -14,3 +14,14 @@ export type CreateTaskRequest = {
     title: string,
     desc: string
 }
+
+export function toTaskResponse(task: Task): TaskResponse {
+    return{
+        id: task.id,
+        title: task.title,
+        desc: task.title,
+        complated: task.completed,
+        createdAt: task.createdAt,
+        updateAt: task.updatedAt
+    }
+}
