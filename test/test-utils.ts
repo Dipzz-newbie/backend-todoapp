@@ -1,4 +1,5 @@
 import { prismaClient } from "../src/app/database";
+import { User } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -39,8 +40,16 @@ export class TestUser {
         name: "test",
         password: await bcrypt.hash("test", 10),
         avatarUrl: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+      },
+    });
+  }
+}
+
+export class TestTask {
+  static async delete() {
+    await prismaClient.task.delete({
+      where: {
+        email: "test@example.com",
       },
     });
   }

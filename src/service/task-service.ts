@@ -11,7 +11,7 @@ export class TaskService {
 
         const record = {
             ...taskCreate,
-            ...{userId: user.id}
+            ...{email: user.email}
         }
 
         const task = await prismaClient.task.create({
