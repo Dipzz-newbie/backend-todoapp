@@ -8,11 +8,6 @@
     "build": "tsc",
     "start": "node dist/server.js"
   },
-  "jest": {
-    "transform": {
-      "^.+\\.[t|j]sx?$": "babel-jest"
-    }
-  },
   "author": "Muhh Dipzz",
   "license": "ISC",
   "dependencies": {

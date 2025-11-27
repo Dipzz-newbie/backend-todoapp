@@ -15,7 +15,7 @@ Request Body:
 
 ```json
 {
-  "text": "Belajar Next.js",
+  "title": "Belajar Next.js",
   "desc": "Belajar"
 }
 ```
@@ -25,12 +25,12 @@ Response Body Success:
 ```json
 {
   "data": {
-    "id": "uuid",
-    "text": "Belajar Next.js",
-    "completed": false,
-    "category": "Belajar",
-    "createdAt": "2025-11-11T13:20:00.000Z",
-    "updatedAt": "2025-11-11T13:20:00.000Z"
+    "id":"<uuid>",
+    "title":"membuat project",
+    "desc":"membuat project",
+    "complated":false,
+    "updateAt":"2025-11-27T12:21:50.491Z",
+    "createdAt":"2025-11-27T12:21:50.491Z",
   }
 }
 ```

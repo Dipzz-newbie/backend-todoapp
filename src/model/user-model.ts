@@ -7,7 +7,7 @@ export type UserResponse = {
     email: string;
     avatarUrl: string | null;
     createdAt: Date | string;
-    updateAt: Date | string | null;
+    updatedAt: Date | string | null;
     token?: string;
     refreshToken?: string;
 }
@@ -35,7 +35,7 @@ export function toUserResponse(user: User): UserResponse {
         name: user.name,
         email: user.email,
         avatarUrl: user.avatarUrl,
-        updateAt: user.updatedAt,
+        updatedAt: user.updatedAt,
         createdAt: user.createdAt,
     }
 }
