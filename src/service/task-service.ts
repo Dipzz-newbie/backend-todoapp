@@ -1,5 +1,5 @@
 import { Task, User } from "@prisma/client";
-import { CreateTaskRequest, TaskResponse, toTaskResponse } from "../model/task-model";
+import { CreateTaskRequest, TaskResponse, toTaskResponse, UpdateTaskRequest } from "../model/task-model";
 import { TaskValidation } from "../validation/task-validation";
 import { Validation } from "../validation/validation";
 import { prismaClient } from "../app/database";
@@ -40,5 +40,20 @@ export class TaskService {
         };
 
         return task;
+    }
+
+    static async update(user: User, request:UpdateTaskRequest): Promise<TaskResponse>{
+        const taskUpdate = Validation.validate(TaskValidation.UPDATE, request);
+        await this.CheckTaskMustExist(user.id, taskUpdate.id);
+
+        const task = await prismaClient.task.update({
+            where: {
+                id: taskUpdate.id,
+                userId: user.id
+            },
+            data: taskUpdate
+        });
+
+        return toTaskResponse(task);
     }
 }
