@@ -16,6 +16,7 @@ export type CreateTaskRequest = {
 }
 
 export type UpdateTaskRequest = {
+    id: number,
     title?: string,
     desc?: string
 }
