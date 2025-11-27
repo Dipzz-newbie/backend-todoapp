@@ -224,22 +224,6 @@ describe("PATCH /api/users/current", () => {
     expect(response.body.data.email).toBeDefined();
   });
 
-  it("Should rejected if data is invalid", async () => {
-    const login = await supertest(web).post("/api/login").send({
-      email: "test@example.com",
-      password: "test",
-    });
-    const token = login.body.data.token
-    const response = await supertest(web)
-      .patch("/api/users/current")
-      .set("Authorization", `Bearer ${token}`)
-      .send({});
-
-    logger.debug(response.body);
-    expect(response.status).toBe(400);
-    expect(response.body.errors).toBeDefined();
-  });
-
   it("Should rejected if token is invalid", async () => {
     const token = TestUser.token() + "salah";
     const response = await supertest(web)

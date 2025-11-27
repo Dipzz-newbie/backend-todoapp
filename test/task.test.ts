@@ -18,11 +18,11 @@ describe("POST /api/users/tasks", () => {
       email: "test@example.com",
       password: "test",
     });
-    const token = login.body.data.token;
+    const access = login.body.data.token;
 
     const response = await supertest(web)
       .post("/api/users/tasks")
-      .set("Authorization", `Bearer ${token}`)
+      .set("Authorization", `Bearer ${access}`)
       .send({
         title: "membuat project",
         desc: "harus commit dalam membuat aplikasi tersebut",
