@@ -46,10 +46,10 @@ model Task {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   desc      String?
-  email     String   @unique
+  userId    String
 
-  user User @relation(fields: [email], references: [email])
+  user User @relation(fields: [userId], references: [id])
 
-  @@index([email])
+  @@index([id])
   @@map("tasks")
 }

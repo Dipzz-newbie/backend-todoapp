@@ -36,6 +36,7 @@ export class TestUser {
   static async create() {
     await prismaClient.user.create({
       data: {
+        id: "1",
         email: "test@example.com",
         name: "test",
         password: await bcrypt.hash("test", 10),
@@ -47,9 +48,9 @@ export class TestUser {
 
 export class TestTask {
   static async delete() {
-    await prismaClient.task.delete({
+    await prismaClient.task.deleteMany({
       where: {
-        email: "test@example.com",
+        userId: "1",
       },
     });
   }

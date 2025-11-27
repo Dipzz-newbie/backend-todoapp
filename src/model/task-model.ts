@@ -22,6 +22,6 @@ export function toTaskResponse(task: Task): TaskResponse {
         desc: task.title,
         complated: task.completed,
         createdAt: task.createdAt,
-        updateAt: task.updatedAt
+        updateAt: task.updatedAt,
     }
 }
