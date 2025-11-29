@@ -1,0 +1,11 @@
+{
+  "transform": {
+    "^.+\\.[tj]sx?$": "babel-jest"
+  },
+  "snapshotFormat": {
+    "escapeString": false,
+    "printBasicPrototype": false,
+    "highlight": true,
+    "min": false
+  }
+}

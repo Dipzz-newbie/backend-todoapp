@@ -1,5 +1,5 @@
 import { prismaClient } from "../src/app/database";
-import { User } from "@prisma/client";
+import { Task, User } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -46,12 +46,54 @@ export class TestUser {
   }
 }
 
+
 export class TestTask {
+
+  static userDummyId: string;
+
   static async delete() {
     await prismaClient.task.deleteMany({
       where: {
-        userId: "1",
+        userId: this.userDummyId,
       },
     });
+  }
+
+  static async create() {
+
+    const userDummy = await prismaClient.user.create({
+      data: {
+        id: "1",
+        email: "test@example.com",
+        name: "test",
+        password: await bcrypt.hash("test", 10),
+        avatarUrl: null,
+      },
+    });
+
+    this.userDummyId = userDummy.id;
+  
+    await prismaClient.task.create({
+      data: {
+        title: "test title",
+        desc: "test desc",
+        userId: this.userDummyId,
+      },
+    });
+
+  }
+
+  static async get(): Promise<Task> {
+    const tasks = await prismaClient.task.findFirst({
+      where: {
+        userId: this.userDummyId,
+      },
+    });
+
+    if (!tasks) {
+      throw new Error("task is not found!");
+    }
+
+    return tasks;
   }
 }

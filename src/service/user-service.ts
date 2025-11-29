@@ -115,17 +115,20 @@ export class UserService {
   ): Promise<UserResponse> {
     const userUpdate = Validation.validate(UserValidation.UPDATE, request);
 
+    const data: any = {};
+
     if (userUpdate) {
-      if (userUpdate.password) {
-        userUpdate.password = await bcrypt.hash(userUpdate.password, 10);
+      if (userUpdate.password !== undefined && userUpdate.password !== "") {
+        const hashPassword = await bcrypt.hash(userUpdate.password, 10);
+        data.password = hashPassword;
       }
 
       if (userUpdate.name) {
-        user.name = userUpdate.name;
+        data.name = userUpdate.name;
       }
 
       if (userUpdate.avatarUrl) {
-        user.avatarUrl = userUpdate.avatarUrl;
+        data.avatarUrl = userUpdate.avatarUrl;
       }
     }
 
@@ -143,13 +146,13 @@ export class UserService {
       where: {
         email: user.email,
       },
-      data: userUpdate,
+      data: data,
     });
 
     return toUserResponse(result);
   }
 
-  static async logout(user: User, refreshToken: string, token:string) {
+  static async logout(user: User, refreshToken: string, token: string) {
     if (!refreshToken) {
       throw new ResponseError(400, "Refresh token is required");
     }

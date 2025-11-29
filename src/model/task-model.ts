@@ -5,9 +5,9 @@ export type TaskResponse = {
     id: string;
     title: string;
     desc: string;
-    complated: boolean;
+    completed: boolean;
     createdAt: Date | string;
-    updateAt: Date | string | null;
+    updatedAt: Date | string | null;
 }
 
 export type CreateTaskRequest = {
@@ -15,13 +15,19 @@ export type CreateTaskRequest = {
     desc: string
 }
 
+export type UpdateTaskRequest = {
+    id?: string,
+    title?: string,
+    desc?: string,
+}
+
 export function toTaskResponse(task: Task): TaskResponse {
     return{
         id: task.id,
         title: task.title,
-        desc: task.title,
-        complated: task.completed,
+        desc: task.desc,
+        completed: task.completed,
         createdAt: task.createdAt,
-        updateAt: task.updatedAt,
+        updatedAt: task.updatedAt,
     }
 }

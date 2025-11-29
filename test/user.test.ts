@@ -204,24 +204,41 @@ describe("PATCH /api/users/current", () => {
     expect(response.body.data.email).toBeDefined();
   });
 
-  it("Should be able to update current user only name and avatar url", async () => {
+  it("Should be able to update user only password and name", async () => {
     const login = await supertest(web).post("/api/login").send({
       email: "test@example.com",
       password: "test",
     });
-    const token = login.body.data.token;
+    const token = login.body.data.token
     const response = await supertest(web)
       .patch("/api/users/current")
       .set("Authorization", `Bearer ${token}`)
-      .send({ 
-        name: "new test",
-        avatarUrl: "http://example.com/avatar.png",
+      .send({
+        name: "Dipzz testing",
+        password: "new password"
       });
 
     logger.debug(response.body);
     expect(response.status).toBe(200);
-    expect(response.body.data.id).toBeDefined();
-    expect(response.body.data.email).toBeDefined();
+    expect(response.body.data.name).toBe("Dipzz testing");
+  });
+
+  it("Should be able to update user only avatar url", async () => {
+    const login = await supertest(web).post("/api/login").send({
+      email: "test@example.com",
+      password: "test",
+    });
+    const token = login.body.data.token
+    const response = await supertest(web)
+      .patch("/api/users/current")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        avatarUrl: "http://example.png"
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.data.avatarUrl).toBe("http://example.png");
   });
 
   it("Should rejected if token is invalid", async () => {
