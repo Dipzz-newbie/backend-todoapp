@@ -51,12 +51,24 @@ export class TaskService {
         const taskUpdate = Validation.validate(TaskValidation.UPDATE, request);
         await this.CheckTaskMustExist(taskUpdate.id, user.id);
 
+        const data: any = {};
+
+        if(taskUpdate) {
+            if(taskUpdate.title !== undefined && taskUpdate.title !== ""){
+                data.title = taskUpdate.title
+            }
+
+            if(taskUpdate.desc !== undefined && taskUpdate.desc !== ""){
+                data.desc = taskUpdate.desc
+            }
+        }
+
         const task = await prismaClient.task.update({
             where: {
                 id: taskUpdate.id,
                 userId: user.id
             },
-            data: taskUpdate
+            data: data
         });
 
         return toTaskResponse(task);

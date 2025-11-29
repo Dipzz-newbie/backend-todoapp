@@ -50,7 +50,7 @@ describe("POST /api/users/tasks", () => {
   });
 });
 
-describe("PUT /api/users/tasks/taskId", () => {
+describe("PATCH /api/users/tasks/taskId", () => {
   beforeEach(async () => {
     await TestTask.create();
   });
@@ -70,7 +70,30 @@ describe("PUT /api/users/tasks/taskId", () => {
     const task = await TestTask.get();
 
     const response = await supertest(web)
-      .put(`/api/users/tasks/${task.id}`)
+      .patch(`/api/users/tasks/${task.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        title: "judul baru",
+        desc: "desc baru",
+      });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.data.title).toBe("judul baru");
+    expect(response.body.data.desc).toBe("desc baru");
+  });
+  
+  it("Should be able to update task", async () => {
+    const login = await supertest(web).post("/api/login").send({
+      email: "test@example.com",
+      password: "test",
+    });
+    const token = login.body.data.token;
+
+    const task = await TestTask.get();
+
+    const response = await supertest(web)
+      .patch(`/api/users/tasks/${task.id}`)
       .set("Authorization", `Bearer ${token}`)
       .send({
         title: "judul baru",

@@ -16,9 +16,9 @@ export type CreateTaskRequest = {
 }
 
 export type UpdateTaskRequest = {
-    id: string,
+    id?: string,
     title?: string,
-    desc?: string
+    desc?: string,
 }
 
 export function toTaskResponse(task: Task): TaskResponse {

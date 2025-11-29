@@ -33,8 +33,10 @@ export class TaskController {
   static async update(req: UserRequest, res: Response, next: NextFunction) {
     try {
       logger.debug(req.params.taskId);
-      const request: UpdateTaskRequest = req.body as UpdateTaskRequest;
-      request.id = req.params.taskId;
+      const request: UpdateTaskRequest = {
+        ...req.body,
+        id : req.params.taskId,
+      };
       const response = await TaskService.update(req.user!, request);
       res.status(200).json({
         data: response,
