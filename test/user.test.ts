@@ -204,24 +204,20 @@ describe("PATCH /api/users/current", () => {
     expect(response.body.data.email).toBeDefined();
   });
 
-  it("Should be able to update current user only name and avatar url", async () => {
+  it("Should rejected if data is invalid", async () => {
     const login = await supertest(web).post("/api/login").send({
       email: "test@example.com",
       password: "test",
     });
-    const token = login.body.data.token;
+    const token = login.body.data.token
     const response = await supertest(web)
       .patch("/api/users/current")
       .set("Authorization", `Bearer ${token}`)
-      .send({ 
-        name: "new test",
-        avatarUrl: "http://example.com/avatar.png",
-      });
+      .send({});
 
     logger.debug(response.body);
-    expect(response.status).toBe(200);
-    expect(response.body.data.id).toBeDefined();
-    expect(response.body.data.email).toBeDefined();
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toBeDefined();
   });
 
   it("Should rejected if token is invalid", async () => {

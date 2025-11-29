@@ -7,7 +7,7 @@ export class TaskValidation {
   });
   
   static readonly UPDATE: ZodType = z.object({
-    title: z.string().min(1).max(191).optional(),
+    title: z.string().min(1).max(191),
     desc: z.string().min(1).max(191).optional()
   });
 }

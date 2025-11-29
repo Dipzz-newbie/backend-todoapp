@@ -16,7 +16,7 @@ export type CreateTaskRequest = {
 }
 
 export type UpdateTaskRequest = {
-    id: number,
+    id: string,
     title?: string,
     desc?: string
 }
@@ -25,7 +25,7 @@ export function toTaskResponse(task: Task): TaskResponse {
     return{
         id: task.id,
         title: task.title,
-        desc: task.title,
+        desc: task.desc,
         completed: task.completed,
         createdAt: task.createdAt,
         updatedAt: task.updatedAt,
