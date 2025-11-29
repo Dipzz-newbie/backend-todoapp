@@ -27,7 +27,7 @@ export class TaskService {
         
     }
 
-    static async CheckTaskMustExist(id: string, userId:string): Promise<Task> {
+    static async CheckTaskMustExist(userId: string, id:string): Promise<Task> {
         const task = await prismaClient.task.findFirst({
             where:  {
                 id: id,
@@ -43,13 +43,13 @@ export class TaskService {
     }
 
     static async get(user:User, id: string): Promise<TaskResponse> {
-        const task = await this.CheckTaskMustExist(user.id, id)
+        const task = await this.CheckTaskMustExist(user.id, id);
         return toTaskResponse(task);
     }
 
     static async update(user: User, request:UpdateTaskRequest): Promise<TaskResponse>{
         const taskUpdate = Validation.validate(TaskValidation.UPDATE, request);
-        await this.CheckTaskMustExist(taskUpdate.id, user.id);
+        await this.CheckTaskMustExist(user.id,taskUpdate.id);
 
         const data: any = {};
 

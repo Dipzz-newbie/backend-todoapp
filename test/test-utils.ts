@@ -81,7 +81,6 @@ export class TestTask {
       },
     });
 
-
   }
 
   static async get(): Promise<Task> {
