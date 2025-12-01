@@ -19,3 +19,4 @@ apiRouter.post("/api/users/logout", UserController.logout);
 apiRouter.post("/api/users/tasks", TaskController.create);
 apiRouter.get("/api/users/tasks/:taskId", TaskController.get);
 apiRouter.patch("/api/users/tasks/:taskId", TaskController.update);
+apiRouter.delete("/api/users/tasks/:taskId", TaskController.remove);

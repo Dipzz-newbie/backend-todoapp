@@ -34,11 +34,25 @@ export class TaskController {
     try {
       const request: UpdateTaskRequest = {
         ...req.body,
-        id : req.params.taskId,
+        id: req.params.taskId,
       };
       const response = await TaskService.update(req.user!, request);
       res.status(200).json({
         data: response,
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async remove(req: UserRequest, res: Response, next: NextFunction) {
+    try {
+      const id = req.params.taskId;
+      await TaskService.remove(req.user!, id);
+      res.status(200).json({
+        data: {
+          message: "data berhasil di hapus!",
+        },
       });
     } catch (e) {
       next(e);
