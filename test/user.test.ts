@@ -209,13 +209,13 @@ describe("PATCH /api/users/current", () => {
       email: "test@example.com",
       password: "test",
     });
-    const token = login.body.data.token
+    const token = login.body.data.token;
     const response = await supertest(web)
       .patch("/api/users/current")
       .set("Authorization", `Bearer ${token}`)
       .send({
         name: "Dipzz testing",
-        password: "new password"
+        password: "new password",
       });
 
     logger.debug(response.body);
@@ -228,12 +228,12 @@ describe("PATCH /api/users/current", () => {
       email: "test@example.com",
       password: "test",
     });
-    const token = login.body.data.token
+    const token = login.body.data.token;
     const response = await supertest(web)
       .patch("/api/users/current")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        avatarUrl: "http://example.png"
+        avatarUrl: "http://example.png",
       });
 
     logger.debug(response.body);
@@ -277,18 +277,8 @@ describe("POST /api/users/logout", () => {
     const refreshAttempt = await supertest(web)
       .post("/api/refresh")
       .send({ refreshToken });
-
-    const response = await supertest(web)
-      .patch("/api/users/current")
-      .set("Authorization", `Bearer ${login.body.data.refreshToken}`)
-      .send({
-        password: "new password",
-        name: "test",
-        avatarUrl: "http://example.com/avatar.png",
-      });
-
-    logger.debug(response.body);
     logger.debug(refreshAttempt.body);
-    expect(response.body.errors).toBeDefined();
+    expect(refreshAttempt.status).toBe(401);
+    expect(refreshAttempt.body.errors).toBeDefined();
   });
 });
