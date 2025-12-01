@@ -62,14 +62,14 @@ export class UserController {
 
   static async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
-      const { refresh_token } = req.body;
+      const { refreshToken } = req.body;
 
-      if (!refresh_token) {
+      if (!refreshToken) {
         throw new ResponseError(400, "Refresh token is required");
       }
 
       const tokenRecord = await prismaClient.refreshToken.findUnique({
-        where: { token: refresh_token },
+        where: { token: refreshToken },
       });
 
       if (!tokenRecord) {
@@ -95,7 +95,7 @@ export class UserController {
       );
 
       await prismaClient.refreshToken.delete({
-        where: { token: refresh_token },
+        where: { token: refreshToken },
       });
 
       const newRefreshToken = generateRefreshToken();
@@ -121,10 +121,10 @@ export class UserController {
 
   static async logout(req: UserRequest, res: Response, next: NextFunction) {
     try {
-      const { refreshToken, token } = req.body;
+      const { refreshToken} = req.body;
       const user = req.user!;
 
-      await UserService.logout(user, refreshToken, token);
+      await UserService.logout(user, refreshToken);
 
       res.status(200).json({
         data: {
