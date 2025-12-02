@@ -326,16 +326,16 @@ describe("UPDATE /api/users/:taskId", () => {
 });
 
 describe("DELETE /api/users/tasks/:taskId", () => {
-  beforeEach(async() => {
+  beforeEach(async () => {
     await TestTask.create();
   });
 
-  afterEach(async() => {
+  afterEach(async () => {
     await TestTask.delete();
     await TestUser.delete();
   });
 
-  it("should be able delete task", async() => {
+  it("should be able delete task", async () => {
     const login = await supertest(web).post("/api/login").send({
       email: "test@example.com",
       password: "test"
@@ -351,7 +351,7 @@ describe("DELETE /api/users/tasks/:taskId", () => {
     expect(response.body.data.message).toBeDefined();
   });
 
-  it("should rejected if task is not found", async() => {
+  it("should rejected if task is not found", async () => {
     const login = await supertest(web).post("/api/login").send({
       email: "test@example.com",
       password: "test"
@@ -388,4 +388,52 @@ describe("DELETE /api/users/tasks/:taskId", () => {
     expect(response.status).toBe(401);
     expect(response.body.errors).toBeDefined();
   });
-})
+});
+
+describe("GET /api/users/tasks", () => {
+  beforeEach(async () => {
+    await TestTask.create();
+    await TestTask.createManyTask();
+  });
+
+  afterEach(async () => {
+    await TestTask.delete();
+    await TestUser.delete();
+  });
+
+  it("should be able to get list task", async() => {
+    const login = await supertest(web).post("/api/login").send({
+      email: "test@example.com",
+      password: "test"
+    });
+
+    const token = login.body.data.token;
+
+    const response = await supertest(web).get("/api/users/tasks").set("Authorization", `Bearer ${token}`);
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.data.length).toBe(16);
+  });
+
+  it("should rejected if token is expired", async () => {
+    const expToken = await TestTask.expToken()
+
+    const response = await supertest(web).get(`/api/users/tasks`).set("Authorization", `Bearer ${expToken}`)
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.errors).toBeDefined();
+  });
+
+  it("should rejected if token is invalid", async () => {
+    const token = "00000000-0000-0000-0000-000000000000"
+
+    const response = await supertest(web).get(`/api/users/tasks`).set("Authorization", `Bearer ${token}`)
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.errors).toBeDefined();
+  });
+});
+
