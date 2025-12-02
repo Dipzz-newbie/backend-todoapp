@@ -244,3 +244,148 @@ describe("GET /api/users/tasks/taskId", () => {
     expect(response.body.errors).toBeDefined();
   });
 });
+
+describe("UPDATE /api/users/:taskId", () => {
+  beforeEach(async () => {
+    await TestTask.create();
+  });
+
+  afterEach(async () => {
+    await TestTask.delete();
+    await TestUser.delete();
+  });
+
+  it("should be able to update task ", async () => {
+    const login = await supertest(web).post("/api/login").send({
+      email: "test@example.com",
+      password: "test"
+    });
+
+    const token = login.body.data.token;
+
+    const task = await TestTask.get();
+
+    const response = await supertest(web).patch(`/api/users/tasks/${task.id}`).set("Authorization", `Bearer ${token}`).send({
+      title: "sekarang udah di perbarui title nya",
+      desc: "udah di update sekarang desc nya"
+    });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.data.title).toBe("sekarang udah di perbarui title nya");
+    expect(response.body.data.desc).toBe("udah di update sekarang desc nya");
+  });
+
+  it("should rejected if task is not found ", async () => {
+    const login = await supertest(web).post("/api/login").send({
+      email: "test@example.com",
+      password: "test"
+    });
+
+    const token = login.body.data.token;
+
+    const task = "00000000-0000-0000-0000-000000000000"
+
+    const response = await supertest(web).patch(`/api/users/tasks/${task}`).set("Authorization", `Bearer ${token}`).send({
+      title: "sekarang udah di perbarui title nya",
+      desc: "udah di update sekarang desc nya"
+    });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(404);
+    expect(response.body.errors).toBeDefined();
+  });
+
+  it("should rejected if token is expired", async () => {
+    const expToken = await TestTask.expToken()
+    const task = "00000000-0000-0000-0000-000000000000"
+
+    const response = await supertest(web).patch(`/api/users/tasks/${task}`).set("Authorization", `Bearer ${expToken}`).send({
+      title: "sekarang udah di perbarui title nya",
+      desc: "udah di update sekarang desc nya"
+    });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.errors).toBeDefined();
+  });
+
+  it("should rejected if token is invalid", async () => {
+    const expToken = "00000000-0000-0000-0000-000000000000"
+    const task = "00000000-0000-0000-0000-000000000000"
+
+    const response = await supertest(web).patch(`/api/users/tasks/${task}`).set("Authorization", `Bearer ${expToken}`).send({
+      title: "sekarang udah di perbarui title nya",
+      desc: "udah di update sekarang desc nya"
+    });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.errors).toBeDefined();
+  });
+});
+
+describe("DELETE /api/users/tasks/:taskId", () => {
+  beforeEach(async() => {
+    await TestTask.create();
+  });
+
+  afterEach(async() => {
+    await TestTask.delete();
+    await TestUser.delete();
+  });
+
+  it("should be able delete task", async() => {
+    const login = await supertest(web).post("/api/login").send({
+      email: "test@example.com",
+      password: "test"
+    });
+
+    const token = login.body.data.token;
+    const task = await TestTask.get();
+
+    const response = await supertest(web).delete(`/api/users/tasks/${task.id}`).set("Authorization", `Bearer ${token}`);
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.data.message).toBeDefined();
+  });
+
+  it("should rejected if task is not found", async() => {
+    const login = await supertest(web).post("/api/login").send({
+      email: "test@example.com",
+      password: "test"
+    });
+
+    const token = login.body.data.token;
+    const task = "00000000-0000-0000-0000-000000000000"
+
+    const response = await supertest(web).delete(`/api/users/tasks/${task}`).set("Authorization", `Bearer ${token}`);
+
+    logger.debug(response.body);
+    expect(response.status).toBe(404);
+    expect(response.body.errors).toBeDefined();
+  });
+
+  it("should rejected if token is expired", async () => {
+    const expToken = await TestTask.expToken()
+    const task = "00000000-0000-0000-0000-000000000000"
+
+    const response = await supertest(web).delete(`/api/users/tasks/${task}`).set("Authorization", `Bearer ${expToken}`)
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.errors).toBeDefined();
+  });
+
+  it("should rejected if token is invalid", async () => {
+    const expToken = "00000000-0000-0000-0000-000000000000"
+    const task = "00000000-0000-0000-0000-000000000000"
+
+    const response = await supertest(web).delete(`/api/users/tasks/${task}`).set("Authorization", `Bearer ${expToken}`)
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.errors).toBeDefined();
+  });
+})

@@ -20,20 +20,24 @@ export const authMiddleware = async (
       token,
       process.env.JWT_SECRET!
     ) as jwt.JwtPayload;
-    
+
     const user = await prismaClient.user.findUnique({
       where: {
-        id: payload.id as string
-      }
+        id: payload.id as string,
+      },
     });
 
-    if(!user) {
+    if (!user) {
       return res.status(401).json({ errors: "Unauthorized" }).end();
     }
 
     req.user = user!;
     next();
-  } catch (err) {
-    return res.status(401).json({ errors: "Unauthorized" }).end();
+  } catch (err: any) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({ errors: "Token expired" }).end();
+    }
+
+    return res.status(401).json({ errors: "Invalid token" }).end();
   }
 };

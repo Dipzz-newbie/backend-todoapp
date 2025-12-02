@@ -16,9 +16,9 @@ Request Body :
 
 ```json
 {
-  "email": "user@example.com",
-  "password": "test",
-  "name": "User Nama"
+  "email": "test@example.com",
+  "password": "rahasia",
+  "name": "Dipz"
 }
 ```
 
@@ -26,13 +26,13 @@ Response Body Success:
 
 ```json
 {
-  {
-  "id":"<id:uuid>",
-  "name":"test",
-  "email":"test@example.com",
-  "avatarUrl":null,
-  "createdAt":"2025-11-24T12:15:17.689Z",
-  "updateAt":"2025-11-24T12:15:17.689Z"
+  "data": {
+    "id": "uuid",
+    "name": "Dipz",
+    "email": "test@example.com",
+    "avatarUrl": null,
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": null
   }
 }
 ```
@@ -61,8 +61,8 @@ Request Body:
 
 ```json
 {
-  "email": "user@example.com",
-  "password": "password123"
+  "email": "test@example.com",
+  "password": "rahasia"
 }
 ```
 
@@ -71,15 +71,15 @@ Response Body (Success):
 ```json
 {
   "data": {
-    "id": "<id:uuid>",
-    "name": "test",
+    "id": "uuid",
+    "name": "Dipz",
     "email": "test@example.com",
     "avatarUrl": null,
-    "refreshToken": "<token:uuid>",
-    "token": "<token:uuid>",
-    "updateAt": "2025-11-24T12:20:12.688Z"
-  },
-  "createdAt": "2025-11-24T12:20:12.688Z"
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": null,
+    "token": "jwt_access_token",
+    "refreshToken": "refresh_token_string"
+  }
 }
 ```
 
@@ -96,7 +96,7 @@ Response Error:
 #### Refresh Token API
 
 ```http
-End Point : POST /api/users/current
+End Point : POST /api/refresh-token
 ```
 
 Header:
@@ -107,10 +107,7 @@ Request Body:
 
 ```json
 {
-  "data": {
-    "refershToken": "<token:uuid>",
-    "token": "<token:uuid>"
-  }
+  "refreshToken": "your_refresh_token"
 }
 ```
 
@@ -119,8 +116,8 @@ Response Body Success:
 ```json
 {
   "data": {
-    "refershToken": "<token:uuid>",
-    "token": "<token:uuid>"
+    "token": "new_access_token",
+    "refreshToken": "refresh_token"
   }
 }
 ```
@@ -152,12 +149,12 @@ Response Body Success:
 ```json
 {
   "data": {
-    "id": "<id:uuid>",
+    "id": "uuid",
+    "name": "Dipz",
     "email": "test@example.com",
-    "name": "test",
     "avatarUrl": null,
-    "createdAt": "2025-11-24T13:21:26.759Z",
-    "updateAt": "2025-11-24T13:21:26.759Z"
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": null
   }
 }
 ```
@@ -187,9 +184,9 @@ Request Body (one or both fields allowed):
 
 ```json
 {
-  "password": "new password",
-  "name": "test",
-  "avatarUrl": "http://example.com/avatar.png"
+  "name": "New Name",
+  "password": "newPassword",
+  "avatarUrl": "https://example.com/avatar.png"
 }
 ```
 
@@ -198,13 +195,12 @@ Response Body Success:
 ```json
 {
   "data": {
-    "data":{
-      "id":"<id:uuid>",
-      "email":"test@example.com",
-      "name":"test",
-      "avatarUrl":"http://example.com/avatar.png",
-      "createdAt":"2025-11-24T13:25:15.675Z",
-      "updateAt":"2025-11-24T13:25:16.050Z"}
+    "id": "uuid",
+    "name": "New Name",
+    "email": "test@example.com",
+    "avatarUrl": "https://example.com/avatar.png",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-02T00:00:00.000Z"
   }
 }
 ```
@@ -217,7 +213,7 @@ Response Error:
 }
 ```
 
-#### Logout User 
+#### Logout User
 
 ```http
 End Point : POST /api/users/logout
@@ -231,9 +227,7 @@ Request Body:
 
 ```json
 {
-  "data": {
-    "refershToken": "<token:uuid>",
-  }
+  "refreshToken": "refresh_token"
 }
 ```
 
@@ -242,8 +236,7 @@ Response Body Success:
 ```json
 {
   "data": {
-    "refershToken": "<token:uuid>",
-    "token": "<token:uuid>"
+    "message": "Logout successfully"
   }
 }
 ```
@@ -252,11 +245,8 @@ Response Body Error:
 
 ```json
 {
-  "data": {
-    "errors": "Refresh token is required"
-  }
+  "errors": "Invalid or expired refresh token"
 }
 ```
-
 
 ---

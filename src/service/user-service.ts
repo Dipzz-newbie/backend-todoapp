@@ -18,14 +18,12 @@ export class UserService {
   static async register(request: CreateUserRequest): Promise<UserResponse> {
     const userRegister = Validation.validate(UserValidation.REGISTER, request);
 
-    const totalUserWithSameUsername = await prismaClient.user.count({
-      where: {
-        email: userRegister.email,
-      },
+    const existingUser = await prismaClient.user.count({
+      where: { email: userRegister.email },
     });
 
-    if (totalUserWithSameUsername != 0) {
-      throw new ResponseError(400, "Email is already exist");
+    if (existingUser !== 0) {
+      throw new ResponseError(400, "Email already exists");
     }
 
     userRegister.password = await bcrypt.hash(userRegister.password, 10);
@@ -38,48 +36,35 @@ export class UserService {
   }
 
   static async login(request: LoginUserRequest): Promise<UserResponse> {
-    const userLogin = Validation.validate(UserValidation.LOGIN, request);
+    const loginData = Validation.validate(UserValidation.LOGIN, request);
 
-    let user = await prismaClient.user.findUnique({
-      where: {
-        email: userLogin.email,
-      },
+    const user = await prismaClient.user.findUnique({
+      where: { email: loginData.email },
     });
 
     if (!user) {
-      throw new ResponseError(401, "Password or email is incorrect");
+      throw new ResponseError(401, "Email or password is incorrect");
     }
 
     const isPasswordValid = await bcrypt.compare(
-      userLogin.password,
+      loginData.password,
       user.password
     );
 
     if (!isPasswordValid) {
-      throw new ResponseError(401, "Password or email is incorrect");
+      throw new ResponseError(401, "Email or password is incorrect");
     }
 
     const secret = process.env.JWT_SECRET;
     const jwtExpiresIn = process.env.JWT_EXPIRES_IN;
 
-    if (!secret) {
-      throw new ResponseError(500, "JWT secret is not defined");
-    }
+    if (!secret) throw new ResponseError(500, "JWT secret is not defined");
+    if (!jwtExpiresIn)
+      throw new ResponseError(500, "JWT expiresIn is not defined");
 
-    if (!jwtExpiresIn) {
-      throw new ResponseError(500, "JWT expires in is not defined");
-    }
-
-    const accessToken = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-      },
-      secret,
-      {
-        expiresIn: jwtExpiresIn,
-      } as jwt.SignOptions
-    );
+    const accessToken = jwt.sign({ id: user.id, email: user.email }, secret, {
+      expiresIn: jwtExpiresIn,
+    } as jwt.SignOptions);
 
     const refreshToken = generateRefreshToken();
 
@@ -93,17 +78,16 @@ export class UserService {
 
     const response = toUserResponse(user);
     response.token = accessToken;
+
     return {
       ...response,
       refreshToken: refreshToken,
-    } as any;
+    };
   }
 
   static async get(user: User): Promise<UserResponse> {
     const userGet = await prismaClient.user.findUnique({
-      where: {
-        id: user.id,
-      },
+      where: { id: user.id },
     });
 
     return toUserResponse(userGet!);
@@ -117,55 +101,40 @@ export class UserService {
 
     const data: any = {};
 
-    if (userUpdate) {
-      if (userUpdate.password !== undefined && userUpdate.password !== "") {
-        const hashPassword = await bcrypt.hash(userUpdate.password, 10);
-        data.password = hashPassword;
-      }
-
-      if (userUpdate.name) {
-        data.name = userUpdate.name;
-      }
-
-      if (userUpdate.avatarUrl) {
-        data.avatarUrl = userUpdate.avatarUrl;
-      }
+    if (userUpdate.password) {
+      data.password = await bcrypt.hash(userUpdate.password, 10);
     }
+    if (userUpdate.name) data.name = userUpdate.name;
+    if (userUpdate.avatarUrl) data.avatarUrl = userUpdate.avatarUrl;
 
-    const userExistsOnDatabase = await prismaClient.user.findUnique({
-      where: {
-        email: user.email,
-      },
+    const updated = await prismaClient.user.update({
+      where: { id: user.id },
+      data,
     });
 
-    if (!userExistsOnDatabase) {
-      throw new ResponseError(404, "User not found");
-    }
-
-    const result = await prismaClient.user.update({
-      where: {
-        email: user.email,
-      },
-      data: data,
-    });
-
-    return toUserResponse(result);
+    return toUserResponse(updated);
   }
 
-  static async logout(user: User, refreshToken: string, token: string) {
+  static async logout(user: User, refreshToken: string) {
     if (!refreshToken) {
       throw new ResponseError(400, "Refresh token is required");
     }
 
-    if (!token) {
-      throw new ResponseError(401, "Unauthorized");
-    }
-
-    await prismaClient.refreshToken.deleteMany({
+    const existing = await prismaClient.refreshToken.findFirst({
       where: {
-        userId: user.id,
         token: refreshToken,
+        userId: user.id,
       },
     });
+
+    if (!existing) {
+      throw new ResponseError(401, "Invalid or expired refresh token");
+    }
+
+    await prismaClient.refreshToken.delete({
+      where: { id: existing.id },
+    });
+
+    return { message: "Logout successfully" };
   }
 }

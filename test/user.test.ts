@@ -93,7 +93,7 @@ describe("POST /api/login", () => {
   });
 });
 
-describe("POST /api/users/currrent", () => {
+describe("POST /api/refresh-token", () => {
   beforeEach(async () => {
     await TestUser.create();
   });
@@ -112,9 +112,9 @@ describe("POST /api/users/currrent", () => {
     const refresh_token = login.body.data.refreshToken;
 
     const response = await supertest(web)
-      .post("/api/users/current")
+      .post("/api/refresh-token")
       .set("Authorization", `Bearer ${token}`)
-      .send({ refresh_token: refresh_token });
+      .send({ refreshToken: refresh_token });
 
     logger.debug(response.body);
 
@@ -124,7 +124,7 @@ describe("POST /api/users/currrent", () => {
 
   it("Should reject invalid refresh token", async () => {
     const response = await supertest(web)
-      .post("/api/users/current")
+      .post("/api/refresh-token")
       .send({ refreshToken: "invalid" });
 
     expect(response.status).toBe(401);

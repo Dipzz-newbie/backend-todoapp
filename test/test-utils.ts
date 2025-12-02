@@ -36,7 +36,6 @@ export class TestUser {
   static async create() {
     await prismaClient.user.create({
       data: {
-        id: "1",
         email: "test@example.com",
         name: "test",
         password: await bcrypt.hash("test", 10),
@@ -50,6 +49,7 @@ export class TestUser {
 export class TestTask {
 
   static userDummyId: string;
+  static userDummyEmail: string;
 
   static async delete() {
     await prismaClient.task.deleteMany({
@@ -71,8 +71,9 @@ export class TestTask {
       },
     });
 
+    this.userDummyEmail = userDummy.email;
     this.userDummyId = userDummy.id;
-  
+
     await prismaClient.task.create({
       data: {
         title: "test title",
@@ -95,5 +96,18 @@ export class TestTask {
     }
 
     return tasks;
+  }
+
+  static async expToken() {
+    const expiredToken = jwt.sign(
+      {
+        id: this.userDummyId,
+        email: this.userDummyEmail,
+        exp: Math.floor(Date.now() / 1000) - 10,
+      },
+      process.env.JWT_SECRET!
+    );
+
+    return expiredToken
   }
 }
