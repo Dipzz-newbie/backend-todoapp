@@ -34,12 +34,10 @@ export const authMiddleware = async (
     req.user = user!;
     next();
   } catch (err: any) {
-    // 🔥 token expired
     if (err.name === "TokenExpiredError") {
       return res.status(401).json({ errors: "Token expired" }).end();
     }
 
-    // 🔥 token invalid / malformed
     return res.status(401).json({ errors: "Invalid token" }).end();
   }
 };
