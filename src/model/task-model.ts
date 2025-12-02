@@ -4,7 +4,7 @@ import { Task } from "@prisma/client"
 export type TaskResponse = {
     id: string;
     title: string;
-    desc: string;
+    desc: string | null;
     completed: boolean;
     createdAt: Date | string;
     updatedAt: Date | string | null;

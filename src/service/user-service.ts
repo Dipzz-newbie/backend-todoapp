@@ -35,7 +35,7 @@ export class UserService {
     return toUserResponse(user);
   }
 
-  static async login(request: LoginUserRequest): Promise<any> {
+  static async login(request: LoginUserRequest): Promise<UserResponse> {
     const loginData = Validation.validate(UserValidation.LOGIN, request);
 
     const user = await prismaClient.user.findUnique({
@@ -76,10 +76,12 @@ export class UserService {
       },
     });
 
+    const response = toUserResponse(user);
+    response.token = accessToken;
+
     return {
-      user: toUserResponse(user),
-      accessToken,
-      refreshToken,
+      ...response,
+      refreshToken: refreshToken,
     };
   }
 

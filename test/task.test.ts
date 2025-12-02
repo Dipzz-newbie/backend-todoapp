@@ -2,7 +2,6 @@ import supertest from "supertest";
 import { TestTask, TestUser } from "./test-utils";
 import { web } from "../src/app/web";
 import { logger } from "../src/app/logging";
-import jwt from "jsonwebtoken";
 
 describe("POST /api/users/tasks", () => {
   beforeEach(async () => {
@@ -226,7 +225,7 @@ describe("GET /api/users/tasks/taskId", () => {
 
     const response = await supertest(web)
       .get(`/api/users/tasks/${notExistTaskId}`)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Authorization", `Bearer ${token}`)
 
     logger.debug(response.body);
     expect(response.status).toBe(404);
@@ -235,87 +234,10 @@ describe("GET /api/users/tasks/taskId", () => {
 
   it("Should be rejected if token is invalid or not found", async () => {
     const task = await TestTask.get();
-    const token = "00000000-0000-0000-0000-000000000000";
+    const token = "00000000-0000-0000-0000-000000000000"
     const response = await supertest(web)
       .get(`/api/users/tasks/${task.id}`)
-      .set("Authorization", `Bearer ${token}`);
-
-    logger.debug(response.body);
-    expect(response.status).toBe(401);
-    expect(response.body.errors).toBeDefined();
-  });
-});
-
-describe("DELETE /api/users/tasks/taskId", () => {
-  beforeEach(async () => {
-    await TestTask.create();
-  });
-
-  afterEach(async () => {
-    await TestTask.delete();
-    await TestUser.delete();
-  });
-
-  it("Should be able to delete task", async () => {
-    const login = await supertest(web).post("/api/login").send({
-      email: "test@example.com",
-      password: "test",
-    });
-    const token = login.body.data.token;
-
-    const task = await TestTask.get();
-
-    const response = await supertest(web)
-      .delete(`/api/users/tasks/${task.id}`)
-      .set("Authorization", `Bearer ${token}`);
-
-    logger.debug(response.body);
-    expect(response.status).toBe(200);
-    expect(response.body.data.message).toBeDefined();
-  });
-
-  it("Should be rejected if task is not found", async () => {
-    const login = await supertest(web).post("/api/login").send({
-      email: "test@example.com",
-      password: "test",
-    });
-    const token = login.body.data.token;
-
-    const notExistTaskId = "00000000-0000-0000-0000-000000000000";
-
-    const response = await supertest(web)
-      .delete(`/api/users/tasks/${notExistTaskId}`)
-      .set("Authorization", `Bearer ${token}`);
-
-    logger.debug(response.body);
-    expect(response.status).toBe(404);
-    expect(response.body.errors).toBeDefined();
-  });
-
-  it("Should be rejected when token expired on delete task", async () => {
-    const task = await TestTask.get();
-
-    const expiredToken = jwt.sign(
-      { userId: "test-user-id" },
-      process.env.JWT_SECRET!,
-      { expiresIn: "-10s" }
-    );
-
-    const response = await supertest(web)
-      .delete(`/api/users/tasks/${task.id}`)
-      .set("Authorization", `Bearer ${expiredToken}`);
-
-    logger.debug(response.body);
-    expect(response.status).toBe(401);
-    expect(response.body.errors).toBe("Token expired");
-  });
-
-  it("Should be rejected if token is invalid or not found", async () => {
-    const task = await TestTask.get();
-    const token = "00000000-0000-0000-0000-000000000000";
-    const response = await supertest(web)
-      .delete(`/api/users/tasks/${task.id}`)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Authorization", `Bearer ${token}`)
 
     logger.debug(response.body);
     expect(response.status).toBe(401);

@@ -45,7 +45,7 @@ model Task {
   completed Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  desc      String
+  desc      String?
   userId    String
 
   user User @relation(fields: [userId], references: [id])

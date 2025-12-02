@@ -36,7 +36,6 @@ export class TestUser {
   static async create() {
     await prismaClient.user.create({
       data: {
-        id: "1",
         email: "test@example.com",
         name: "test",
         password: await bcrypt.hash("test", 10),

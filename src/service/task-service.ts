@@ -1,88 +1,86 @@
 import { Task, User } from "@prisma/client";
-import { CreateTaskRequest, TaskResponse, toTaskResponse, UpdateTaskRequest } from "../model/task-model";
+import {
+  CreateTaskRequest,
+  TaskResponse,
+  toTaskResponse,
+  UpdateTaskRequest,
+} from "../model/task-model";
 import { TaskValidation } from "../validation/task-validation";
 import { Validation } from "../validation/validation";
 import { prismaClient } from "../app/database";
 import { ResponseError } from "../error/response-error";
 
-
 export class TaskService {
-    static async create(user:User, request: CreateTaskRequest): Promise<TaskResponse> {
-        const taskCreate = Validation.validate(TaskValidation.CREATE, request);
+  static async create(
+    user: User,
+    request: CreateTaskRequest
+  ): Promise<TaskResponse> {
+    const taskCreate = Validation.validate(TaskValidation.CREATE, request);
 
-        if(!taskCreate) {
-            throw new ResponseError(400, "Text is required")
-        }
+    const task = await prismaClient.task.create({
+      data: {
+        title: taskCreate.title,
+        desc: taskCreate.desc,
+        userId: user.id,
+      },
+    });
 
-        const record = {
-            ...taskCreate,
-            ...{userId: user.id}
-        }
+    return toTaskResponse(task);
+  }
 
-        const task = await prismaClient.task.create({
-            data: record
-        })
+  static async checkTask(userId: string, taskId: string): Promise<Task> {
+    const task = await prismaClient.task.findFirst({
+      where: {
+        id: taskId,
+        userId: userId,
+      },
+    });
 
-        return toTaskResponse(task);
-        
+    if (!task) {
+      throw new ResponseError(404, "Task not found");
     }
 
-    static async CheckTaskMustExist(userId: string, id:string): Promise<Task> {
-        const task = await prismaClient.task.findFirst({
-            where:  {
-                id: id,
-                userId: userId,
-            }
-        });
+    return task;
+  }
 
-        if(!task) {
-            throw new ResponseError(404, "Task is not found!")
-        };
+  static async get(user: User, id: string): Promise<TaskResponse> {
+    const task = await this.checkTask(user.id, id);
+    return toTaskResponse(task);
+  }
 
-        return task;
+  static async update(
+    user: User,
+    request: UpdateTaskRequest
+  ): Promise<TaskResponse> {
+    const payload = Validation.validate(TaskValidation.UPDATE, request);
+
+    const existing = await this.checkTask(user.id, payload.id);
+
+    const data: any = {
+      title: payload.title,
+      desc: payload.desc,
+    };
+
+    if (payload.desc !== undefined && payload.desc !== "") {
+      data.desc = payload.desc;
     }
 
-    static async get(user:User, id: string): Promise<TaskResponse> {
-        const task = await this.CheckTaskMustExist(user.id, id);
-        return toTaskResponse(task);
-    }
 
-    static async update(user: User, request:UpdateTaskRequest): Promise<TaskResponse>{
-        const taskUpdate = Validation.validate(TaskValidation.UPDATE, request);
-        await this.CheckTaskMustExist(user.id,taskUpdate.id);
+    const updated = await prismaClient.task.update({
+      where: { id: existing.id },
+      data,
+    });
 
-        const data: any = {};
+    return toTaskResponse(updated);
+  }
 
-        if(taskUpdate) {
-            if(taskUpdate.title !== undefined && taskUpdate.title !== ""){
-                data.title = taskUpdate.title
-            }
+  static async remove(user: User, id: string): Promise<TaskResponse> {
+    const existing = await this.checkTask(user.id, id);
 
-            if(taskUpdate.desc !== undefined && taskUpdate.desc !== ""){
-                data.desc = taskUpdate.desc
-            }
-        }
+    const deleted = await prismaClient.task.delete({
+      where: { id: existing.id },
+    });
 
-        const task = await prismaClient.task.update({
-            where: {
-                id: taskUpdate.id,
-                userId: user.id
-            },
-            data: data
-        });
-
-        return toTaskResponse(task);
-    }
-
-    static async remove(user:User, id:string):Promise<TaskResponse> {
-        await this.CheckTaskMustExist(user.id, id);
-        const removeTask = await prismaClient.task.delete({
-            where: {
-                id: id,
-                userId: user.id
-            }
-        });
-
-        return toTaskResponse(removeTask);
-    }
+    return toTaskResponse(deleted);
+  }
 }
