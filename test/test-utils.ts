@@ -110,4 +110,17 @@ export class TestTask {
 
     return expiredToken
   }
+
+  static async createManyTask() {
+  const contacts = Array.from({ length: 15 }, (_, i) => ({
+    title: `test ${i}`,
+    desc: `test ${i}`,
+    userId: this.userDummyId
+  }));
+
+  await prismaClient.task.createMany({
+    data: contacts,
+    skipDuplicates: true
+  });
+}
 }
