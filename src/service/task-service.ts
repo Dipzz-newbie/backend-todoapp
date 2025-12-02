@@ -83,4 +83,16 @@ export class TaskService {
 
     return toTaskResponse(deleted);
   }
+
+  static async list(user: User, id: string): Promise<Array<TaskResponse>> {
+    await this.checkTask(user.id, id);
+
+    const task = await prismaClient.task.findMany({
+      where: {
+        id: id
+      }
+    });
+
+    return task.map((tasks) => toTaskResponse(tasks));
+  }
 }
