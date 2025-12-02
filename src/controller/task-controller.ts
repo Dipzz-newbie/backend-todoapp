@@ -55,4 +55,15 @@ export class TaskController {
       next(e);
     }
   }
+
+  static async list(req: UserRequest, res: Response, next: NextFunction) {
+    try{
+      const response = await TaskService.list(req.user!);
+      res.status(200).json({
+        data: response
+      })
+    }catch(e) {
+      next(e)
+    }
+  }
 }

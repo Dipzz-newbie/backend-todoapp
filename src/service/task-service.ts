@@ -83,4 +83,25 @@ export class TaskService {
 
     return toTaskResponse(deleted);
   }
+
+  static async list(user: User): Promise<Array<TaskResponse>> {
+    
+    const checkUser = await prismaClient.task.findFirst({
+      where: {
+        userId: user.id
+      }
+    });
+
+    if(!checkUser) {
+      throw new ResponseError(404, "Task is not found!")
+    }
+
+    const task = await prismaClient.task.findMany({
+      where: {
+        userId: user.id
+      }
+    });
+
+    return task.map((tasks) => toTaskResponse(tasks));
+  }
 }
