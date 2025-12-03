@@ -11,5 +11,11 @@ export class TaskValidation {
     title: z.string().min(1).max(191).optional(),
     desc: z.string().optional(),
   });
+
+  static readonly SEARCH: ZodType = z.object({
+    title: z.string().optional(),
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional()
+  })
 }
 
