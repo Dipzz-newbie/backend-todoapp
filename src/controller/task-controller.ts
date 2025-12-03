@@ -1,6 +1,6 @@
 import { Response, NextFunction } from "express";
 import { UserRequest } from "../type/user-request";
-import { CreateTaskRequest, UpdateTaskRequest } from "../model/task-model";
+import { CreateTaskRequest, SearchTaskRequest, UpdateTaskRequest } from "../model/task-model";
 import { TaskService } from "../service/task-service";
 
 export class TaskController {
@@ -62,6 +62,20 @@ export class TaskController {
       res.status(200).json({
         data: response
       })
+    }catch(e) {
+      next(e)
+    }
+  }
+
+  static async search(req: UserRequest, res: Response, next: NextFunction) {
+    try{
+      const request: SearchTaskRequest = {
+        title: req.query.title ? String(req.query.title) : undefined,
+        createdAt: req.query.createdAt ? String(req.query.title): undefined,
+        updatedAt: req.query.updatedAt ? String(req.query.updatedAt) : undefined,
+        page: req.query.page ? Number(req.query.page): 1,
+        size: req.query.size ? Number(req.query.size): 10,
+      }
     }catch(e) {
       next(e)
     }

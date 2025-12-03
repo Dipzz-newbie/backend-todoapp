@@ -22,13 +22,15 @@ export type UpdateTaskRequest = {
 }
 
 export type SearchTaskRequest = {
-    title?: string;
-    createdAt?: string;
-    updatedAt?: string;
+    title?: string,
+    createdAt?: string,
+    updatedAt?: string,
+    page: number,
+    size: number,
 }
 
 export function toTaskResponse(task: Task): TaskResponse {
-    return{
+    return {
         id: task.id,
         title: task.title,
         desc: task.desc,

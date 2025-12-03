@@ -20,3 +20,4 @@ apiRouter.get("/api/users/tasks/:taskId", TaskController.get);
 apiRouter.patch("/api/users/tasks/:taskId", TaskController.update);
 apiRouter.delete("/api/users/tasks/:taskId", TaskController.remove);
 apiRouter.get("/api/users/tasks", TaskController.list);
+apiRouter.get("/api/users/tasks/search", TaskController.search);

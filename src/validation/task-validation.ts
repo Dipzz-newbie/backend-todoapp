@@ -15,7 +15,9 @@ export class TaskValidation {
   static readonly SEARCH: ZodType = z.object({
     title: z.string().optional(),
     createdAt: z.string().optional(),
-    updatedAt: z.string().optional()
+    updatedAt: z.string().optional(),
+    page: z.number().min(1),
+    size: z.number().min(1)
   })
 }
 
