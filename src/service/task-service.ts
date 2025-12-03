@@ -1,6 +1,7 @@
 import { Task, User } from "@prisma/client";
 import {
   CreateTaskRequest,
+  SearchTaskRequest,
   TaskResponse,
   toTaskResponse,
   UpdateTaskRequest,
@@ -9,6 +10,7 @@ import { TaskValidation } from "../validation/task-validation";
 import { Validation } from "../validation/validation";
 import { prismaClient } from "../app/database";
 import { ResponseError } from "../error/response-error";
+import { PageAble } from "../model/page-model";
 
 export class TaskService {
   static async create(
@@ -85,14 +87,14 @@ export class TaskService {
   }
 
   static async list(user: User): Promise<Array<TaskResponse>> {
-    
+
     const checkUser = await prismaClient.task.findFirst({
       where: {
         userId: user.id
       }
     });
 
-    if(!checkUser) {
+    if (!checkUser) {
       throw new ResponseError(404, "Task is not found!")
     }
 
@@ -103,5 +105,65 @@ export class TaskService {
     });
 
     return task.map((tasks) => toTaskResponse(tasks));
+  }
+
+  static async search(user: User, request: SearchTaskRequest): Promise<PageAble<TaskResponse>> {
+    const searchTask = await Validation.validate(TaskValidation.SEARCH, request);
+
+    const skip = (searchTask.page - 1) * searchTask.size;
+
+    let filters = [];
+
+    if (searchTask.title) {
+      filters.push({
+        title: {
+          contains: searchTask.title
+        }
+      })
+    }
+
+    if (searchTask.createdAt) {
+      filters.push({
+        createdAt: {
+          gte: new Date(`${searchTask.createdAt}T00:00:00+07:00`),
+          lt: new Date(`${searchTask.createdAt}T23:59:59+07:00`),
+        }
+      })
+    }
+
+    if (searchTask.updatedAt) {
+      filters.push({
+        updatedAt: {
+          gte: new Date(`${searchTask.updatedAt}T00:00:00+07:00`),
+          lt: new Date(`${searchTask.updatedAt}T23:59:59+07:00`)
+        }
+      })
+    }
+
+    const task = await prismaClient.task.findMany({
+      where: {
+        userId: user.id,
+        AND: filters
+      },
+      take: searchTask.size,
+      skip: skip
+    });
+
+    const total = await prismaClient.task.count({
+      where: {
+        userId: user.id,
+        AND: filters
+      }
+    });
+
+    return {
+      data: task.map((tasks) => toTaskResponse(tasks)),
+      paging: {
+        current_page: searchTask.page,
+        total_page: Math.ceil(total / searchTask.size),
+        size: searchTask.size,
+      }
+    }
+
   }
 }
