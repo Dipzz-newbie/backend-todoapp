@@ -50,6 +50,8 @@ export class TestTask {
 
   static userDummyId: string;
   static userDummyEmail: string;
+  static taskDummyCreatedAt: Date;
+  static taskDummyUpdateAt: Date;
 
   static async delete() {
     await prismaClient.task.deleteMany({
@@ -74,13 +76,16 @@ export class TestTask {
     this.userDummyEmail = userDummy.email;
     this.userDummyId = userDummy.id;
 
-    await prismaClient.task.create({
+    const taskDummy = await prismaClient.task.create({
       data: {
         title: "test title",
         desc: "test desc",
         userId: this.userDummyId,
       },
     });
+
+    this.taskDummyCreatedAt = taskDummy.createdAt;
+    this.taskDummyUpdateAt = taskDummy.updatedAt;
 
   }
 
@@ -112,15 +117,23 @@ export class TestTask {
   }
 
   static async createManyTask() {
-  const contacts = Array.from({ length: 15 }, (_, i) => ({
-    title: `test ${i}`,
-    desc: `test ${i}`,
-    userId: this.userDummyId
-  }));
+    const contacts = Array.from({ length: 15 }, (_, i) => ({
+      title: `test ${i}`,
+      desc: `test ${i}`,
+      userId: this.userDummyId
+    }));
 
-  await prismaClient.task.createMany({
-    data: contacts,
-    skipDuplicates: true
-  });
-}
+    await prismaClient.task.createMany({
+      data: contacts,
+      skipDuplicates: true
+    });
+  }
+
+  static createdAt() {
+    return this.taskDummyCreatedAt.toISOString().split("T")[0];
+  }
+
+  static updatedAt() {
+    return this.taskDummyUpdateAt.toISOString().split("T")[0];
+  }
 }

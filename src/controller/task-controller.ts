@@ -71,11 +71,13 @@ export class TaskController {
     try{
       const request: SearchTaskRequest = {
         title: req.query.title ? String(req.query.title) : undefined,
-        createdAt: req.query.createdAt ? String(req.query.title): undefined,
-        updatedAt: req.query.updatedAt ? String(req.query.updatedAt) : undefined,
+        createdAt: req.query.createdAt ? String(req.query.createAt) : undefined,
+        updatedAt: req.query.updatedAt ? String(req.query.updateAt): undefined,
         page: req.query.page ? Number(req.query.page): 1,
         size: req.query.size ? Number(req.query.size): 10,
       }
+      const response = await TaskService.search(req.user!, request);
+      res.status(200).json(response)
     }catch(e) {
       next(e)
     }
