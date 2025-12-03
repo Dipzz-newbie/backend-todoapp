@@ -401,7 +401,7 @@ describe("GET /api/users/tasks", () => {
     await TestUser.delete();
   });
 
-  it("should be able to get list task", async() => {
+  it("should be able to get list task", async () => {
     const login = await supertest(web).post("/api/login").send({
       email: "test@example.com",
       password: "test"
@@ -436,4 +436,102 @@ describe("GET /api/users/tasks", () => {
     expect(response.body.errors).toBeDefined();
   });
 });
+
+describe("GET /api/users/tasks/search", () => {
+  beforeEach(async () => {
+    await TestTask.create();
+    await TestTask.createManyTask();
+  });
+
+  afterEach(async () => {
+    await TestTask.delete();
+    await TestUser.delete();
+  });
+
+  it("should be able to get tasks on different search", async () => {
+    const login = await supertest(web).post("/api/login").send({
+      email: "test@example.com",
+      password: "test"
+    });
+
+    const token = login.body.data.token;
+
+    const response = await supertest(web).get("/api/users/tasks/search").set("Authorization", `bearer ${token}`).query({
+      title: "test title",
+    });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.data.length).toBe(1);
+    expect(response.body.paging.current_page).toBe(1);
+    expect(response.body.paging.total_page).toBe(1);
+    expect(response.body.paging.size).toBe(10);
+
+  })
+
+  it("should be able to get tasks with search createAt", async () => {
+    const login = await supertest(web).post("/api/login").send({
+      email: "test@example.com",
+      password: "test"
+    });
+
+    const token = login.body.data.token;
+    const createAt = TestTask.createdAt();
+
+    const response = await supertest(web).get("/api/users/tasks/search").set("Authorization", `bearer ${token}`).query({
+      createAt: createAt,
+    });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.data.length).toBe(10);
+    expect(response.body.paging.current_page).toBe(1);
+    expect(response.body.paging.total_page).toBe(2);
+    expect(response.body.paging.size).toBe(10);
+
+  })
+
+  it("should be able to change current page", async () => {
+    const login = await supertest(web).post("/api/login").send({
+      email: "test@example.com",
+      password: "test"
+    });
+
+    const token = login.body.data.token;
+    const createAt = TestTask.createdAt();
+
+    const response = await supertest(web).get("/api/users/tasks/search").set("Authorization", `bearer ${token}`).query({
+      createAt: createAt,
+      page: 2
+    });
+
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.data.length).toBe(6);
+    expect(response.body.paging.current_page).toBe(2);
+    expect(response.body.paging.total_page).toBe(2);
+    expect(response.body.paging.size).toBe(10);
+
+  });
+
+  it("should rejected if token is expired", async () => {
+    const expToken = await TestTask.expToken()
+
+    const response = await supertest(web).get(`/api/users/tasks/search`).set("Authorization", `Bearer ${expToken}`)
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.errors).toBeDefined();
+  });
+
+  it("should rejected if token is invalid", async () => {
+    const token = "00000000-0000-0000-0000-000000000000"
+
+    const response = await supertest(web).get(`/api/users/tasks/search`).set("Authorization", `Bearer ${token}`)
+
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.errors).toBeDefined();
+  });
+})
 
