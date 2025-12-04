@@ -1,8 +1,8 @@
-## API SPEC
+# User API
 
-### Auth API
+# Before User Login "User Regiser"
 
-#### Register API
+## Register API
 
 ```http
 End Point : POST /api/register
@@ -47,7 +47,7 @@ Response Error:
 
 ---
 
-#### Login API
+## Login API
 
 ```http
 End Point : POST /api/login
@@ -93,7 +93,7 @@ Response Error:
 
 ---
 
-#### Refresh Token API
+## Refresh Token API
 
 ```http
 End Point : POST /api/refresh-token
@@ -132,9 +132,9 @@ Response Body Error:
 }
 ```
 
-### User Profile
+# After User Login "User Profile"
 
-#### Get User Profile
+## Get User Profile
 
 ```http
 End Point : GET /api/users/current
@@ -169,7 +169,7 @@ Response Error:
 
 ---
 
-#### Update User Profile
+## Update User Profile
 
 ```http
 End Point : PATCH /api/users/current
@@ -213,7 +213,7 @@ Response Error:
 }
 ```
 
-#### Logout User
+## Logout User
 
 ```http
 End Point : POST /api/users/logout
