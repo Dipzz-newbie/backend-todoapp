@@ -1,3 +1,4 @@
 package-lock.json
-.env
+/home/dipz/Documents/todoapp-project/backend-todoapp/.env
 node_modules
+dist
