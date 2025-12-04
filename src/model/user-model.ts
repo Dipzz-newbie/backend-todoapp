@@ -15,6 +15,7 @@ export type UserResponse = {
 export type LoginUserRequest = {
     email: string;
     password: string;
+    userAgent: string;
 }
 
 export type CreateUserRequest = {

@@ -68,13 +68,37 @@ export class UserService {
 
     const refreshToken = generateRefreshToken();
 
-    await prismaClient.refreshToken.create({
-      data: {
-        token: refreshToken,
+    const agent = request.userAgent;
+
+    const existing = await prismaClient.refreshToken.findFirst({
+      where: {
         userId: user.id,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      },
+        userAgent: agent
+      }
     });
+
+    if (existing) {
+      await prismaClient.refreshToken.update({
+        where: {
+          userId_userAgent: {
+            userId: user.id,
+            userAgent: agent
+          }
+        },
+        data: {
+          token: refreshToken
+        }
+      })
+    } else {
+      await prismaClient.refreshToken.create({
+        data: {
+          token: refreshToken,
+          userId: user.id,
+          userAgent: agent,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
+      });
+    }
 
     const response = toUserResponse(user);
     response.token = accessToken;

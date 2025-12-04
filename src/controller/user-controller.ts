@@ -26,7 +26,10 @@ export class UserController {
 
   static async login(req: Request, res: Response, next: NextFunction) {
     try {
-      const request: LoginUserRequest = req.body as LoginUserRequest;
+      const request: LoginUserRequest = {
+        ...req.body,
+        userAgent: req.headers["user-agent"] || "unknown"
+      };
       const response = await UserService.login(request);
       res.status(200).json({
         data: response,
@@ -62,13 +65,14 @@ export class UserController {
 
   static async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
+      const agent = req.headers["user-agent"] || "unknown"
       const { refreshToken } = req.body;
 
       if (!refreshToken) {
         throw new ResponseError(400, "Refresh token is required");
       }
 
-      const tokenRecord = await prismaClient.refreshToken.findUnique({
+      const tokenRecord = await prismaClient.refreshToken.findFirst({
         where: { token: refreshToken },
       });
 
@@ -95,7 +99,13 @@ export class UserController {
       );
 
       await prismaClient.refreshToken.delete({
-        where: { token: refreshToken },
+        where: {
+          userId_userAgent: {
+            userId: user.id,
+            userAgent: agent
+          },
+          token: refreshToken
+        },
       });
 
       const newRefreshToken = generateRefreshToken();
@@ -104,6 +114,7 @@ export class UserController {
         data: {
           token: newRefreshToken,
           userId: user.id,
+          userAgent: agent,
           expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         },
       });
@@ -121,7 +132,7 @@ export class UserController {
 
   static async logout(req: UserRequest, res: Response, next: NextFunction) {
     try {
-      const { refreshToken} = req.body;
+      const { refreshToken } = req.body;
       const user = req.user!;
 
       await UserService.logout(user, refreshToken);
