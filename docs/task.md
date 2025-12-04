@@ -1,6 +1,6 @@
-### Task API
+# Task API
 
-#### Create Task
+## Create Task
 
 ```http
 End Point : POST /api/users/tasks
@@ -45,7 +45,7 @@ Response Error:
 
 ---
 
-#### Update Task
+## Update Task
 
 ```http
 End Point : PUT /api/users/tasks/:taskId
@@ -91,7 +91,7 @@ Response Error:
 
 ---
 
-#### Get Task by id
+## Get Task by id
 
 ```http
 End Point : GET /api/users/tasks/:taskId
@@ -126,7 +126,7 @@ Response Error:
 
 ---
 
-#### List All User Tasks
+## List All User Tasks
 
 ```http
 End Point : GET /api/users/tasks
@@ -170,8 +170,65 @@ Response Error:
 ```
 
 ---
+## Search Task
+```http
+End Point : GET /api/users/tasks/search
+```
+Header: 
 
-#### Delete Task
+- Authorization: Bearer <Token>
+
+Query params :
+
+- title : Search title using like, optional
+- createdAt : Search date createdAt using like, optional
+- updatedAt : Search date updatedAt, optional
+- page : Number of page, default 1
+- size : Size per page, default 10
+
+Response Body Success: 
+
+```json
+{
+  "data": [
+    {
+      "id": "<uuid>",
+      "title": "belajar mencintai dia",
+      "desc": "harus bisa berusaha",
+      "completed": false,
+      "createdAt": "<date>",
+      "updatedAt": "<date>"
+    },
+    {
+      "id": "a6f551f2-f16f-4fce-b3be-2b5852719ec5",
+      "title": "test title",
+      "desc": "test desc",
+      "completed": false,
+      "createdAt": "2025-12-04T12:29:36.668Z",
+      "updatedAt": "2025-12-04T12:29:36.668Z"
+    }
+  ],
+  "paging": {
+    "current_page": 2,
+    "size": 10,
+    "total_page": 2
+  }
+}
+
+```
+
+Response Error:
+
+```json
+{
+  "errors": "Task not found"
+}
+```
+
+
+---
+
+## Delete Task
 
 ```http
 End Point : DELETE /api/users/tasks/:taskId
