@@ -139,14 +139,9 @@ export class UserService {
     return toUserResponse(updated);
   }
 
-  static async logout(user: User, refreshToken: string) {
-    if (!refreshToken) {
-      throw new ResponseError(400, "Refresh token is required");
-    }
-
+  static async logout(user: User) {
     const existing = await prismaClient.refreshToken.findFirst({
       where: {
-        token: refreshToken,
         userId: user.id,
       },
     });
@@ -156,9 +151,7 @@ export class UserService {
     }
 
     await prismaClient.refreshToken.delete({
-      where: { id: existing.id },
+      where: { token: existing.token },
     });
-
-    return { message: "Logout successfully" };
   }
 }
