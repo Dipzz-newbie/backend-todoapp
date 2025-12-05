@@ -2,6 +2,7 @@ import supertest from "supertest";
 import { TestUser } from "./test-utils";
 import { web } from "../src/app/web";
 import { logger } from "../src/app/logging";
+import { prismaClient } from "../src/app/database";
 
 describe("POST /api/register", () => {
   afterEach(async () => {
@@ -263,32 +264,52 @@ describe("POST /api/users/logout", () => {
     await TestUser.delete();
   });
 
-  it("Should logout and invalidate refresh token", async () => {
-    const login = await supertest(web).post("/api/login").send({
-      email: "test@example.com",
-      password: "test",
-    });
-
-    const refreshToken = login.body.data.refreshToken;
-    const token = login.body.data.token;
-
-    await supertest(web).post("/api/logout").send({ refreshToken, token });
-
-    const refreshAttempt = await supertest(web)
-      .post("/api/refresh")
-      .send({ refreshToken });
-
-    const response = await supertest(web)
-      .patch("/api/users/current")
-      .set("Authorization", `Bearer ${login.body.data.refreshToken}`)
+  it("should logout successfully and delete the refresh token", async () => {
+    const login = await supertest(web)
+      .post("/api/login")
+      .set("User-Agent", "jest-test-agent")
       .send({
-        password: "new password",
-        name: "test",
-        avatarUrl: "http://example.com/avatar.png",
+        email: "test@example.com",
+        password: "test"
       });
 
-    logger.debug(response.body);
-    logger.debug(refreshAttempt.body);
-    expect(response.body.errors).toBeDefined();
+    expect(login.status).toBe(200);
+
+    const accessToken = login.body.data.token;
+    const refreshToken = login.body.data.refreshToken;
+
+    const stored = await prismaClient.refreshToken.findFirst({
+      where: {
+        token: refreshToken,
+        userAgent: "jest-test-agent"
+      }
+    });
+
+    expect(stored).not.toBeNull();
+
+
+    const logoutResponse = await supertest(web)
+      .post("/api/users/logout")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .set("User-Agent", "jest-test-agent")
+      .send({
+        refreshToken: stored?.token,
+        userAgent: "jest-test-agent"
+      });
+
+    logger.debug(logoutResponse.body);
+
+    expect(logoutResponse.status).toBe(200);
+    expect(logoutResponse.body.message).toBe("Logout successfully");
+
+
+    const checkAfter = await prismaClient.refreshToken.findFirst({
+      where: {
+        token: stored?.token
+      }
+    });
+
+    expect(checkAfter).toBeNull();
   });
+
 });
