@@ -132,15 +132,20 @@ export class UserController {
 
   static async logout(req: UserRequest, res: Response, next: NextFunction) {
     try {
-      await UserService.logout(req.user!);
+      const refreshToken = req.body.refreshToken;
+      const userAgent = req.headers["user-agent"] as string;
+
+      const request = { refreshToken, userAgent };
+
+      await UserService.logout(req.user!, request);
 
       res.status(200).json({
-        data: {
-          message: "Successfully logged out",
-        },
+        message: "Logout successfully"
       });
+
     } catch (e) {
       next(e);
     }
   }
+
 }

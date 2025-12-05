@@ -139,19 +139,27 @@ export class UserService {
     return toUserResponse(updated);
   }
 
-  static async logout(user: User) {
+  static async logout(user: User, request: { refreshToken: string, userAgent: string }) {
+
     const existing = await prismaClient.refreshToken.findFirst({
       where: {
         userId: user.id,
-      },
+        userAgent: request.userAgent,
+        token: request.refreshToken,
+      }
     });
 
     if (!existing) {
-      throw new ResponseError(401, "Invalid or expired refresh token");
+      throw new ResponseError(404, "Refresh token not found");
     }
 
     await prismaClient.refreshToken.delete({
-      where: { token: existing.token },
+      where: {
+        id: existing.id
+      }
     });
+
+    return true;
   }
+
 }
