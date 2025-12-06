@@ -139,11 +139,10 @@ export class UserService {
     return toUserResponse(updated);
   }
 
-  static async logout(user: User, request: { refreshToken: string, userAgent: string }) {
+  static async logout(request: { refreshToken: string, userAgent: string }) {
 
     const existing = await prismaClient.refreshToken.findFirst({
       where: {
-        userId: user.id,
         userAgent: request.userAgent,
         token: request.refreshToken,
       }
