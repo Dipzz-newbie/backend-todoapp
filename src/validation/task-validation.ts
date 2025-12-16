@@ -10,6 +10,7 @@ export class TaskValidation {
     id: z.string().uuid(),
     title: z.string().min(1).max(191).optional(),
     desc: z.string().optional(),
+    completed: z.boolean().optional()
   });
 
   static readonly SEARCH: ZodType = z.object({

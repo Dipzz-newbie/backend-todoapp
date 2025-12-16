@@ -63,10 +63,17 @@ export class TaskService {
       desc: payload.desc,
     };
 
+    if (payload.title !== undefined) {
+      data.title = payload.title;
+    }
+
     if (payload.desc !== undefined && payload.desc !== "") {
       data.desc = payload.desc;
     }
 
+    if(payload.completed !== undefined && payload.completed !== "") {
+      data.completed = payload.completed
+    }
 
     const updated = await prismaClient.task.update({
       where: { id: existing.id },
