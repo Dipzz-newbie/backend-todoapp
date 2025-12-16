@@ -7,14 +7,11 @@ import cors from "cors"
 
 export const web = express();
 
-const corsOption = {
-    origin: [
-        "127.0.0.1:3000"
-    ],
-    Credential: true,
-    method: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeadears: ['Content-Type', 'Authorization', 'User-Agent'] 
-}
+const corsOptions = {
+    origin: "http://localhost:8080",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+};
 
 const ratelimiter = rateLimit({
     windowMs: 60 * 1000,
@@ -25,7 +22,7 @@ const ratelimiter = rateLimit({
     }
 })
 
-web.use(cors(corsOption));
+web.use(cors(corsOptions));
 web.use(express.json());
 web.use(ratelimiter);
 web.use(publicRouter);
