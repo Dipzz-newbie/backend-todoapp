@@ -33,6 +33,7 @@ export class TaskController {
         id: req.params.taskId,
         title: req.body.title,
         desc: req.body.desc,
+        completed: req.body.completed
       };
 
       const response = await TaskService.update(req.user!, request);
