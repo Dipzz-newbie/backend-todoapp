@@ -61,6 +61,7 @@ export class TaskService {
     const data: any = {
       title: payload.title,
       desc: payload.desc,
+      completed: payload.completed
     };
 
     if (payload.title !== undefined) {
