@@ -58,10 +58,7 @@ export class TaskService {
 
     const existing = await this.checkTask(user.id, payload.id);
 
-    const data: any = {
-      title: payload.title,
-      desc: payload.desc,
-    };
+    const data: any = {};
 
     if (payload.title !== undefined) {
       data.title = payload.title;
@@ -71,8 +68,8 @@ export class TaskService {
       data.desc = payload.desc;
     }
 
-    if(payload.completed !== undefined && payload.completed !== "") {
-      data.completed = payload.completed
+    if (payload.completed !== undefined) {
+      data.completed = payload.completed;
     }
 
     const updated = await prismaClient.task.update({
