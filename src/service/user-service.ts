@@ -125,16 +125,19 @@ export class UserService {
 
     const data: any = {};
 
-    if (userUpdate.password) {
+    if (userUpdate.password !== undefined) {
       data.password = await bcrypt.hash(userUpdate.password, 10);
     }
-    if (userUpdate.name) data.name = userUpdate.name;
-    if (userUpdate.avatarUrl) data.avatarUrl = userUpdate.avatarUrl;
 
-    const updated = await prismaClient.user.update({
-      where: { id: user.id },
-      data,
-    });
+    if (userUpdate.name !== undefined) {
+      data.name = userUpdate.name;
+    }
+
+    if (userUpdate.avatarUrl !== undefined) {
+      data.avatarUrl = userUpdate.avatarUrl;
+    }
+
+    const updated = await prismaClient.user.update({ where: { id: user.id }, data, });
 
     return toUserResponse(updated);
   }
