@@ -23,6 +23,7 @@ const ratelimiter = rateLimit({
 })
 
 web.use(cors(corsOptions));
+web.use("/uploads", express.static("uploads"));
 web.use(express.json());
 web.use(ratelimiter);
 web.use(publicRouter);

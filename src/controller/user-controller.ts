@@ -135,7 +135,7 @@ export class UserController {
 
       const request: any = {
         refreshToken: req.body.refreshToken,
-        userAgent: req.headers["user-agent"] 
+        userAgent: req.headers["user-agent"]
       };
 
       await UserService.logout(request);
@@ -149,27 +149,29 @@ export class UserController {
     }
   }
 
-  static async uploadAvatar(
-    req: UserRequest,
-    res: Response,
-    next: NextFunction
-  ) {
+  static async uploadAvatar(req: UserRequest, res: Response, next: NextFunction) {
     try {
       if (!req.file) {
-        throw new Error("Avatar file is required");
+        throw new ResponseError(400, "File not found");
       }
 
-      const user = req.user!;
-      const file = req.file;
+      const avatarUrl = `/uploads/avatars/${req.file.filename}`;
 
-      const result = await UserService.updateAvatar(user, file.filename);
+      const updated = await prismaClient.user.update({
+        where: { id: req.user!.id },
+        data: { avatarUrl },
+      });
 
       res.status(200).json({
-        data: result,
+        data: {
+          avatarUrl: updated.avatarUrl,
+        },
       });
     } catch (e) {
       next(e);
     }
   }
+
+
 
 }
