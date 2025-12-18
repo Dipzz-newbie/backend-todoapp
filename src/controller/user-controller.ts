@@ -149,6 +149,27 @@ export class UserController {
     }
   }
 
-  
+  static async uploadAvatar(
+    req: UserRequest,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      if (!req.file) {
+        throw new Error("Avatar file is required");
+      }
+
+      const user = req.user!;
+      const file = req.file;
+
+      const result = await UserService.updateAvatar(user, file.filename);
+
+      res.status(200).json({
+        data: result,
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
 
 }
