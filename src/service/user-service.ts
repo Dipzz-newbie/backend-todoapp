@@ -164,4 +164,18 @@ export class UserService {
     return true;
   }
 
+  static async updateAvatar(
+    user: User,
+    avatarFilename: string
+  ): Promise<{ avatarUrl: string }> {
+    const avatarUrl = `/uploads/avatars/${avatarFilename}`;
+
+    const updatedUser = await prismaClient.user.update({
+      where: { id: user.id },
+      data: { avatarUrl },
+    });
+
+    return { avatarUrl: updatedUser.avatarUrl! };
+  }
+
 }

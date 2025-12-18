@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
 export const uploadAvatar = multer({
     storage,
     limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB
+        fileSize: 5 * 1024 * 1024,
     },
     fileFilter: (_req, file, cb) => {
         if (!file.mimetype.startsWith("image/")) {
