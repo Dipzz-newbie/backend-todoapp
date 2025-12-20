@@ -117,30 +117,42 @@ export class UserService {
     return toUserResponse(userGet!);
   }
 
-  static async update(
-    user: User,
-    request: UpdateUserRequest
-  ): Promise<UserResponse> {
-    const userUpdate = Validation.validate(UserValidation.UPDATE, request);
+  static async update(user: User, request: UpdateUserRequest): Promise<UserResponse> {
+  const userUpdate = Validation.validate(UserValidation.UPDATE, request);
 
-    const data: any = {};
+  const data: any = {};
 
-    if (userUpdate.password !== undefined) {
-      data.password = await bcrypt.hash(userUpdate.password, 10);
-    }
-
-    if (userUpdate.name !== undefined) {
-      data.name = userUpdate.name;
-    }
-
-    if (userUpdate.avatarUrl !== undefined) {
-      data.avatarUrl = userUpdate.avatarUrl;
-    }
-
-    const updated = await prismaClient.user.update({ where: { id: user.id }, data, });
-
-    return toUserResponse(updated);
+  if (userUpdate.password !== undefined) {
+    data.password = await bcrypt.hash(userUpdate.password, 10);
   }
+
+  if (userUpdate.name !== undefined) {
+    data.name = userUpdate.name;
+  }
+
+  if (userUpdate.avatarUrl === "") {
+    if (user.avatarUrl) {
+      const fs = require("fs");
+      const path = require("path");
+
+      const filePath = path.join(process.cwd(), "uploads", user.avatarUrl);
+
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    data.avatarUrl = null;
+  }
+
+  const updated = await prismaClient.user.update({
+    where: { id: user.id },
+    data,
+  });
+
+  return toUserResponse(updated);
+}
+
 
   static async logout(request: { refreshToken: string, userAgent: string }) {
 
