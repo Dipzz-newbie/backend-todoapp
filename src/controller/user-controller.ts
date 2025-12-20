@@ -151,40 +151,26 @@ export class UserController {
 
   static async uploadAvatar(req: UserRequest, res: Response, next: NextFunction) {
     try {
-      const user = req.user!;
-      const file = req.file;
-
-      if (!file) {
-        return res.status(400).json({ message: "No file uploaded" });
+      if (!req.file) {
+        throw new ResponseError(400, "File not found");
       }
 
-      if (user.avatarUrl) {
-        const fs = require("fs");
-        const path = require("path");
-
-        const oldPath = path.join(process.cwd(), "uploads", user.avatarUrl);
-
-        if (fs.existsSync(oldPath)) {
-          fs.unlinkSync(oldPath);
-        }
-      }
+      const avatarUrl = `/uploads/avatars/${req.file.filename}`;
 
       const updated = await prismaClient.user.update({
-        where: { id: user.id },
-        data: { avatarUrl: file.filename },
+        where: { id: req.user!.id },
+        data: { avatarUrl },
       });
 
-      res.json({
+      res.status(200).json({
         data: {
           avatarUrl: updated.avatarUrl,
         },
       });
-
     } catch (e) {
       next(e);
     }
   }
-
 
 
 
