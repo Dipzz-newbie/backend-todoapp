@@ -6,8 +6,8 @@
   "scripts": {
     "test": "jest --runInBand",
     "build": "tsc",
-    "start": "node dist/server.js",
-    "migrate": "npx prisma migrate dev"
+    "migrate": "npx prisma migrate dev",
+    "start": "node dist/server.js"
   },
   "author": "Muhh Dipzz",
   "license": "ISC",
@@ -19,6 +19,7 @@
     "express-rate-limit": "^8.2.1",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
+    "serverless-http": "^4.0.0",
     "uuid": "^13.0.0",
     "winston": "^3.11.0",
     "zod": "^3.22.4"
