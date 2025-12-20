@@ -13,6 +13,8 @@ import { Validation } from "../validation/validation";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { generateRefreshToken } from "../utils/token-utils";
+import fs from "fs";
+import path from "path";
 
 export class UserService {
   static async register(request: CreateUserRequest): Promise<UserResponse> {
@@ -117,27 +119,39 @@ export class UserService {
     return toUserResponse(userGet!);
   }
 
-  static async update(
-    user: User,
-    request: UpdateUserRequest
-  ): Promise<UserResponse> {
+ static async update(user: User, request: UpdateUserRequest): Promise<UserResponse> {
     const userUpdate = Validation.validate(UserValidation.UPDATE, request);
 
     const data: any = {};
 
+    
     if (userUpdate.password !== undefined) {
       data.password = await bcrypt.hash(userUpdate.password, 10);
     }
 
+    
     if (userUpdate.name !== undefined) {
       data.name = userUpdate.name;
     }
 
+    
     if (userUpdate.avatarUrl !== undefined) {
+      
+      if (user.avatarUrl) {
+        const oldPath = path.join(process.cwd(), user.avatarUrl);
+
+        if (fs.existsSync(oldPath)) {
+          fs.unlinkSync(oldPath);  
+        }
+      }
+
       data.avatarUrl = userUpdate.avatarUrl;
     }
 
-    const updated = await prismaClient.user.update({ where: { id: user.id }, data, });
+    const updated = await prismaClient.user.update({
+      where: { id: user.id },
+      data,
+    });
 
     return toUserResponse(updated);
   }
