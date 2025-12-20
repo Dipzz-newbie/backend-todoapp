@@ -119,7 +119,8 @@ export class UserService {
     return toUserResponse(userGet!);
   }
 
- static async update(user: User, request: UpdateUserRequest): Promise<UserResponse> {
+
+  static async update(user: User, request: UpdateUserRequest): Promise<UserResponse> {
     const userUpdate = Validation.validate(UserValidation.UPDATE, request);
 
     const data: any = {};
@@ -155,6 +156,7 @@ export class UserService {
 
     return toUserResponse(updated);
   }
+
 
   static async logout(request: { refreshToken: string, userAgent: string }) {
 

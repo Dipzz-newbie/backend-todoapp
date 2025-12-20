@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest --runInBand",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "migrate": "npx prisma migrate dev"
   },
   "author": "Muhh Dipzz",
   "license": "ISC",
