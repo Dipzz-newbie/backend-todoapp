@@ -1,3 +1,0 @@
-1. they have bug on complatedAt into your taskresponse, cause you might not add saome response to you're api
-
-2. the backend have any issue for cors maybe, but you adding a rate limitter really great i think
