@@ -4,6 +4,11 @@
   "description": "",
   "author": "Muhh Dipzz",
   "license": "ISC",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
   "dependencies": {
     "@prisma/client": "^5.10.2",
     "bcrypt": "^5.1.1",

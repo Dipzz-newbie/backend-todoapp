@@ -17,8 +17,4 @@
 
 - you can add on package.json if you running on runtime
 (package.json)
-"main": "server.ts",
- "scripts": {
-    "build": "tsc",
-    "start": "node dist/server.js"
-  },
+
