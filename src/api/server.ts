@@ -1,4 +1,4 @@
-import {web} from "../src/app/web"
+import {web} from "../app/web"
 import serverless from "serverless-http"
 // import { logger } from "./app/logging";
 
