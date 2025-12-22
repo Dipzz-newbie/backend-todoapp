@@ -1,4 +1,4 @@
-import { web } from "./app/web";
+import {web} from "../src/app/web"
 // import { logger } from "./app/logging";
 
 export default web;
