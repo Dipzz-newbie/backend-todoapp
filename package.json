@@ -3,10 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.ts",
-  "scripts": {
-    "build": "tsc",
-    "start": "node dist/server.js"
-  },
   "author": "Muhh Dipzz",
   "license": "ISC",
   "dependencies": {
