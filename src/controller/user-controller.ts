@@ -12,7 +12,6 @@ import { ResponseError } from "../error/response-error";
 import jwt from "jsonwebtoken";
 import { supabase } from "../lib/supabase";
 import path from "path"
-import { logger } from "../app/logging";
 
 export class UserController {
   static async register(req: Request, res: Response, next: NextFunction) {
@@ -193,9 +192,33 @@ export class UserController {
     }
   }
 
+  static async removeAvatar(req: UserRequest, res: Response, next: NextFunction) {
+  try {
+    const user = req.user!;
 
+    if (!user.avatarUrl) {
+      return res.status(200).json({ message: "No avatar to remove" });
+    }
 
+    const oldFile = user.avatarUrl.split("/").pop();
 
+    if (oldFile) {
+      await supabase.storage.from("avatars").remove([oldFile]);
+    }
+
+    await prismaClient.user.update({
+      where: { id: user.id },
+      data: { avatarUrl: "" },
+    });
+
+    return res.status(200).json({
+      message: "Avatar removed",
+      avatarUrl: "",
+    });
+  } catch (err) {
+    next(err);
+  }
+}
 
 
 }

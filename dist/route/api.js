@@ -15,6 +15,7 @@ exports.apiRouter.use(auth_middleware_1.authMiddleware);
 exports.apiRouter.get("/api/users/current", user_controller_1.UserController.get);
 exports.apiRouter.patch("/api/users/current", user_controller_1.UserController.update);
 exports.apiRouter.post("/api/users/avatar", upload_middleware_1.uploadAvatar.single("avatar"), user_controller_1.UserController.uploadAvatar);
+exports.apiRouter.delete("/api/users/avatar", user_controller_1.UserController.removeAvatar);
 //api Task routes
 exports.apiRouter.post("/api/users/tasks", task_controller_1.TaskController.create);
 exports.apiRouter.patch("/api/users/tasks/:taskId", task_controller_1.TaskController.update);

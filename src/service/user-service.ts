@@ -15,6 +15,7 @@ import jwt from "jsonwebtoken";
 import { generateRefreshToken } from "../utils/token-utils";
 import fs from "fs";
 import path from "path";
+import { supabase } from "../lib/supabase";
 
 export class UserService {
   static async register(request: CreateUserRequest): Promise<UserResponse> {
@@ -187,5 +188,4 @@ export class UserService {
     });
     return { avatarUrl: updated.avatarUrl! };
   }
-
 }

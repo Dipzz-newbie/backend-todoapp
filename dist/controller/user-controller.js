@@ -185,5 +185,30 @@ class UserController {
             }
         });
     }
+    static removeAvatar(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = req.user;
+                if (!user.avatarUrl) {
+                    return res.status(200).json({ message: "No avatar to remove" });
+                }
+                const oldFile = user.avatarUrl.split("/").pop();
+                if (oldFile) {
+                    yield supabase_1.supabase.storage.from("avatars").remove([oldFile]);
+                }
+                yield database_1.prismaClient.user.update({
+                    where: { id: user.id },
+                    data: { avatarUrl: "" },
+                });
+                return res.status(200).json({
+                    message: "Avatar removed",
+                    avatarUrl: "",
+                });
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+    }
 }
 exports.UserController = UserController;

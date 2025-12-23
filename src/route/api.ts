@@ -16,6 +16,8 @@ apiRouter.post(
     uploadAvatar.single("avatar"),
     UserController.uploadAvatar
 );
+apiRouter.delete("/api/users/avatar", UserController.removeAvatar);
+
 
 //api Task routes
 apiRouter.post("/api/users/tasks", TaskController.create);
