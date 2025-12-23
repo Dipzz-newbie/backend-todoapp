@@ -151,14 +151,13 @@ class UserService {
             return true;
         });
     }
-    static updateAvatar(user, avatarFilename) {
+    static updateAvatar(user, avatarUrl) {
         return __awaiter(this, void 0, void 0, function* () {
-            const avatarUrl = `/uploads/avatars/${avatarFilename}`;
-            const updatedUser = yield database_1.prismaClient.user.update({
+            const updated = yield database_1.prismaClient.user.update({
                 where: { id: user.id },
                 data: { avatarUrl },
             });
-            return { avatarUrl: updatedUser.avatarUrl };
+            return { avatarUrl: updated.avatarUrl };
         });
     }
 }

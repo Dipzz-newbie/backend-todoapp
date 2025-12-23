@@ -18,6 +18,8 @@ const token_utils_1 = require("../utils/token-utils");
 const database_1 = require("../app/database");
 const response_error_1 = require("../error/response-error");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const supabase_1 = require("../lib/supabase");
+const path_1 = __importDefault(require("path"));
 class UserController {
     static register(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -149,19 +151,34 @@ class UserController {
     static uploadAvatar(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                if (!req.file) {
+                if (!req.file)
                     throw new response_error_1.ResponseError(400, "File not found");
+                const user = req.user;
+                const ext = path_1.default.extname(req.file.originalname);
+                const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+                if (user.avatarUrl) {
+                    const oldPath = user.avatarUrl.split("/avatars/")[1];
+                    if (oldPath) {
+                        yield supabase_1.supabase.storage.from("avatars").remove([oldPath]);
+                    }
                 }
-                const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+                const { error: uploadError } = yield supabase_1.supabase.storage
+                    .from("avatars")
+                    .upload(fileName, req.file.buffer, {
+                    contentType: req.file.mimetype,
+                    upsert: true,
+                });
+                if (uploadError)
+                    throw new response_error_1.ResponseError(500, uploadError.message);
+                const { data: publicUrlData } = supabase_1.supabase.storage
+                    .from("avatars")
+                    .getPublicUrl(fileName);
+                const avatarUrl = publicUrlData.publicUrl;
                 const updated = yield database_1.prismaClient.user.update({
-                    where: { id: req.user.id },
+                    where: { id: user.id },
                     data: { avatarUrl },
                 });
-                res.status(200).json({
-                    data: {
-                        avatarUrl: updated.avatarUrl,
-                    },
-                });
+                res.status(200).json({ data: { avatarUrl: updated.avatarUrl } });
             }
             catch (e) {
                 next(e);

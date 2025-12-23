@@ -180,18 +180,12 @@ export class UserService {
     return true;
   }
 
-  static async updateAvatar(
-    user: User,
-    avatarFilename: string
-  ): Promise<{ avatarUrl: string }> {
-    const avatarUrl = `/uploads/avatars/${avatarFilename}`;
-
-    const updatedUser = await prismaClient.user.update({
+  static async updateAvatar(user: User, avatarUrl: string): Promise<{ avatarUrl: string }> {
+    const updated = await prismaClient.user.update({
       where: { id: user.id },
       data: { avatarUrl },
     });
-
-    return { avatarUrl: updatedUser.avatarUrl! };
+    return { avatarUrl: updated.avatarUrl! };
   }
 
 }

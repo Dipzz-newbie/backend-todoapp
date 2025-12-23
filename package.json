@@ -6,11 +6,13 @@
   "license": "ISC",
   "main": "dist/server.js",
   "scripts": {
-    "build": "prisma generate && tsc",
+    "prisma": "npx prisma migrate",
+    "build": "tsc",
     "start": "node dist/server.js"
   },
   "dependencies": {
     "@prisma/client": "^5.10.2",
+    "@supabase/supabase-js": "^2.89.0",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "express": "^4.18.2",

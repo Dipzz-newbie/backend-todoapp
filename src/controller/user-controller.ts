@@ -10,6 +10,9 @@ import { generateRefreshToken } from "../utils/token-utils";
 import { prismaClient } from "../app/database";
 import { ResponseError } from "../error/response-error";
 import jwt from "jsonwebtoken";
+import { supabase } from "../lib/supabase";
+import path from "path"
+import { logger } from "../app/logging";
 
 export class UserController {
   static async register(req: Request, res: Response, next: NextFunction) {
@@ -151,26 +154,47 @@ export class UserController {
 
   static async uploadAvatar(req: UserRequest, res: Response, next: NextFunction) {
     try {
-      if (!req.file) {
-        throw new ResponseError(400, "File not found");
+      if (!req.file) throw new ResponseError(400, "File not found");
+
+      const user = req.user!;
+      const ext = path.extname(req.file.originalname);
+      const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+
+      if (user.avatarUrl) {
+        const oldPath = user.avatarUrl.split("/avatars/")[1];
+        if (oldPath) {
+          await supabase.storage.from("avatars").remove([oldPath]);
+        }
       }
 
-      const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(fileName, req.file.buffer, {
+          contentType: req.file.mimetype,
+          upsert: true,
+        });
+
+      if (uploadError) throw new ResponseError(500, uploadError.message);
+
+      const { data: publicUrlData } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(fileName);
+
+      const avatarUrl = publicUrlData.publicUrl;
 
       const updated = await prismaClient.user.update({
-        where: { id: req.user!.id },
+        where: { id: user.id },
         data: { avatarUrl },
       });
 
-      res.status(200).json({
-        data: {
-          avatarUrl: updated.avatarUrl,
-        },
-      });
+      res.status(200).json({ data: { avatarUrl: updated.avatarUrl } });
     } catch (e) {
       next(e);
     }
   }
+
+
+
 
 
 
