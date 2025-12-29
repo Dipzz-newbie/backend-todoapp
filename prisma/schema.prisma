@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "mysql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -23,9 +23,9 @@ model User {
 }
 
 model RefreshToken {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid()) @db.Char(36)
   token     String   @unique
-  userId    String
+  userId    String   @db.Char(36)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userAgent String
   expiresAt DateTime
@@ -42,7 +42,7 @@ model Task {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   desc      String?
-  userId    String
+  userId    String   @db.Char(36)
 
   user User @relation(fields: [userId], references: [id])
 
